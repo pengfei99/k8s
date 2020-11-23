@@ -1,0 +1,91 @@
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+
+# add a new repo
+helm repo add airflow <chart-url>
+
+# check repo list
+helm repo list
+
+# search a chart in all repo
+helm search repo airflow
+
+# show values of 
+helm show values bitnami/airflow
+
+# get secret
+kubectl get secret
+
+# get persistent volume list 
+kubectl get pvc -n user-pengfei
+
+# describe a persistent volume
+kubectl describe pvc data-pengfei-airflow-postgresql-0
+
+# delete all pvc 
+kubectl delete pvc --all
+kubectl delete pvc -l app=myapp
+
+# delete one pvc
+kubectl delete pvc <pvc-name>
+
+# get services
+kubectl get services/svc
+
+# install a pod/service by using a config file
+kubectl apply -f deployment.yml
+kubectl apply -f service.yml
+kubectl apply -f .
+
+# delete a pod/service by using a config file
+kubectl delete -f service.yml
+
+
+# install a chart on k8s
+helm install pengfei-airflow stable/airflow
+
+helm show values bitnami/airflow
+
+--set airflow.cloneDagFilesFromGit.enabled=true 
+--set airflow.cloneDagFilesFromGit.repository=REPOSITORY_URL  
+--set airflow.cloneDagFilesFromGit.branch=master 
+--set airflow.baseUrl=http://127.0.0.1:8080 
+
+
+
+
+
+kubectl describe pods pengfei-airflow-scheduler-775cf4c9dd-gn2zm
+
+kubectl logs pengfei-airflow-scheduler-775cf4c9dd-gn2zm
+
+# no space is allowed
+helm upgrade pengfei-airflow bitnami/airflow --set service.type=ClusterIP,airflow.baseUrl=http://127.0.0.1:8080,airflow.auth.username=airflow,airflow.auth.password=airflow,postgresql.postgresqlPassword=airflow,redis.password=airflow
+
+
+# get db password
+kubectl get secret --namespace user-pengfei pengfei-airflow-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
+
+# get redis password
+kubectl get secret --namespace user-pengfei pengfei-airflow-redis -o jsonpath="{.data.redis-password}" | base64 --decode
+
+helm delete pengfei-airflow
+
+helm install pengfei-airflow bitnami/airflow -f values.yml
+
+
+
+##################################### Get a pod shell ###########################################
+kubectl exec --stdin --tty pengfei-airflow-web-6cf77f4b66-m9tq8 -- /bin/bash
+
+################################### port forward a servcie to localhost ########################
+
+kubectl port-forward --namespace user-pengfei svc/pengfei-airflow 8080:8080
+kubectl port-forward --namespace user-pengfei svc/pengfei-airflow-postgresql 5432:5432
+
+################################  helm install a locale chart ################################
+# if your chart uses other helm charts, you need to update your dependencies
+helm dependency update
+
+# the above command will download the required charts.tgz under charts folder
+
+helm upgrade pengfei-airflow ./airflow -f ./airflow/values.yml 

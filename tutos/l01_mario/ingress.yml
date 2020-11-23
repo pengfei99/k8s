@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mario
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+    - hosts:
+        - pengfei.demo.dev.sspcloud.fr
+  rules:
+    - host: pengfei.demo.dev.sspcloud.fr
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: mario
+              servicePort: http
