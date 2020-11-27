@@ -1,0 +1,38 @@
+################################# Helm repo management #######################################
+
+# add a new repo
+helm repo add airflow <chart-url>
+
+# check repo list
+helm repo list
+
+# search a chart in all repo
+helm search repo <chart_name>
+
+################################ Helm list release ########################################
+helm ls
+
+################################ Helm install chart ########################################
+# show default values of a chart 
+helm show values bitnami/airflow
+
+# install a chart with custom values
+helm install pengfei-airflow bitnami/airflow -f values.yml
+
+
+# upgrade an exsiting release with inline values
+helm upgrade pengfei-airflow bitnami/airflow --set service.type=ClusterIP,airflow.baseUrl=http://127.0.0.1:8080,airflow.auth.username=airflow,airflow.auth.password=airflow,postgresql.postgresqlPassword=airflow,redis.password=airflow
+
+
+################################  helm install a locale chart ################################
+# if your chart uses other helm charts, you need to update your dependencies
+helm dependency update
+# the above command will download the required charts.tgz under charts folder
+
+# install a locale chart. here airflow is the folder which you can find Chart.yaml file
+helm install pengfei-airflow ./airflow -f ./airflow/values.yml 
+
+############################## helm delete release #######################################
+helm delete pengfei-airflow
+
+

@@ -1,24 +1,41 @@
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
-# add a new repo
-helm repo add airflow <chart-url>
+################################### resource creation (pods, services)#############################################
 
-# check repo list
-helm repo list
+# install a pod/service by using a config file
+kubectl apply -f deployment.yml
+kubectl apply -f service.yml
+kubectl apply -f .
 
-# search a chart in all repo
-helm search repo airflow
+################################## view existing resource #######################################
 
-# show values of 
-helm show values bitnami/airflow
+# get all deployed pods
+kubectl get pods
 
-# get secret
-kubectl get secret
+# get all pods with details
+kubectl get pods -n user-pengfei -o wide
 
-# get persistent volume list 
+# get details of a pod
+kubectl describe pods <pods_name>
+
+# get logs of a pod
+kubectl logs <pods_name>
+
+# get services
+kubectl get services/svc
+
+################################### Deleting existing resource #################################
+
+# delete a pod/service by using a config file
+kubectl delete -f deployment.yml
+kubectl delete -f service.yml
+
+################################## Persistent volume claim #####################################
+
+# get persistent volume claim list 
 kubectl get pvc -n user-pengfei
 
-# describe a persistent volume
+# describe a persistent volume claim
 kubectl describe pvc data-pengfei-airflow-postgresql-0
 
 # delete all pvc 
@@ -28,51 +45,16 @@ kubectl delete pvc -l app=myapp
 # delete one pvc
 kubectl delete pvc <pvc-name>
 
-# get services
-kubectl get services/svc
+######################################### Get secret ##############################################
 
-# install a pod/service by using a config file
-kubectl apply -f deployment.yml
-kubectl apply -f service.yml
-kubectl apply -f .
+# get secret
+kubectl get secret
 
-# delete a pod/service by using a config file
-kubectl delete -f service.yml
-
-
-# install a chart on k8s
-helm install pengfei-airflow stable/airflow
-
-helm show values bitnami/airflow
-
---set airflow.cloneDagFilesFromGit.enabled=true 
---set airflow.cloneDagFilesFromGit.repository=REPOSITORY_URL  
---set airflow.cloneDagFilesFromGit.branch=master 
---set airflow.baseUrl=http://127.0.0.1:8080 
-
-
-
-
-
-kubectl describe pods pengfei-airflow-scheduler-775cf4c9dd-gn2zm
-
-kubectl logs pengfei-airflow-scheduler-775cf4c9dd-gn2zm
-
-# no space is allowed
-helm upgrade pengfei-airflow bitnami/airflow --set service.type=ClusterIP,airflow.baseUrl=http://127.0.0.1:8080,airflow.auth.username=airflow,airflow.auth.password=airflow,postgresql.postgresqlPassword=airflow,redis.password=airflow
-
-
-# get db password
+# get db password from a secret
 kubectl get secret --namespace user-pengfei pengfei-airflow-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
 
 # get redis password
 kubectl get secret --namespace user-pengfei pengfei-airflow-redis -o jsonpath="{.data.redis-password}" | base64 --decode
-
-helm delete pengfei-airflow
-
-helm install pengfei-airflow bitnami/airflow -f values.yml
-
-
 
 ##################################### Get a pod shell ###########################################
 kubectl exec --stdin --tty pengfei-airflow-web-6cf77f4b66-m9tq8 -- /bin/bash
@@ -82,10 +64,10 @@ kubectl exec --stdin --tty pengfei-airflow-web-6cf77f4b66-m9tq8 -- /bin/bash
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow 8080:8080
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow-postgresql 5432:5432
 
-################################  helm install a locale chart ################################
-# if your chart uses other helm charts, you need to update your dependencies
-helm dependency update
 
-# the above command will download the required charts.tgz under charts folder
+################################### Ingress #################################################
+# show short ingress description
+kubectl get ingress
 
-helm upgrade pengfei-airflow ./airflow -f ./airflow/values.yml 
+# show detailed ingress description
+kubectl describe ingress
