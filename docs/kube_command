@@ -57,7 +57,7 @@ kubectl get secret --namespace user-pengfei pengfei-airflow-postgresql -o jsonpa
 kubectl get secret --namespace user-pengfei pengfei-airflow-redis -o jsonpath="{.data.redis-password}" | base64 --decode
 
 ##################################### Get a pod shell ###########################################
-kubectl exec --stdin --tty pengfei-airflow-web-6cf77f4b66-m9tq8 -- /bin/bash
+kubectl exec --stdin --tty pengfei-airflow-web-798ff4f645-fffqq -- /bin/bash
 
 ################################### port forward a servcie to localhost ########################
 
@@ -71,3 +71,17 @@ kubectl get ingress
 
 # show detailed ingress description
 kubectl describe ingress
+
+kubectl alpha debug -it pengfei-airflow-web-5b67b6b79c-6d7zc --image=busybox --target=pengfei-airflow-web-5b67b6b79c-6d7zc
+
+
+################################# Config map #################################################
+
+# create a config map from a directory of files
+kubectl create configmap dags-configmap --from-file=dags/
+
+# describe an existing configmap
+kubectl describe configmaps dags-configmap
+
+# export a config map in yml format
+kubectl get configmaps dags-configmap -o yaml
