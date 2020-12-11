@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # define the name of this deployment
+  name: nginx-deployment
+  # define a label of this deployment, usefull to group a set of deployment
+  labels: 
+    app: pengfei-deployment-test
+# spec of the deployment
+spec:
+  # defines which template this deployment uses, it must match the template(i.e. pod) label
+  selector:
+    matchLabels:
+      app: pengfei-test
+  # number of the replicas of the pod    
+  replicas: 2
+  # template(i.e. description) of the pod
+  template:
+    metadata:
+      # label of the pod
+      labels:
+        app: pengfei-test
+    spec:
+      containers:
+        # no 1 container of the pod
+      - name: nginx-container
+        image: nginx:1.7.9
+        # set the limit of the pod resource, by default there is no limit
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
