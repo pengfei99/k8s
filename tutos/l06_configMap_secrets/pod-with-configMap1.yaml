@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-envvar-pod
+spec:
+  containers:
+    - name: test-container
+      image: busybox
+      command: [ "/bin/sh", "-c", "env" ]
+      env:
+        # Define the environment variable in the container
+        - name: FOOBAR_AGE
+          valueFrom:
+            configMapKeyRef:
+              # The ConfigMap name containing the value you want to assign to FOOBAR_AGE
+              name: pengfei-config
+              # Specify the key in the configMap wwhich you want to show the value
+              key: pengfei.age
+        - name: FOOBAR_SEX
+          valueFrom:
+            configMapKeyRef:
+              name: pengfei-config
+              key: pengfei.sex
+        - name: FOOBAR_SEX
+          valueFrom:
+            configMapKeyRef:
+              name: pengfei-config
+              key: pengfei.sex
+        
+  restartPolicy: Never

@@ -72,7 +72,7 @@ kubectl get ingress
 # show detailed ingress description
 kubectl describe ingress
 
-kubectl alpha debug -it pengfei-airflow-web-5b67b6b79c-6d7zc --image=busybox --target=pengfei-airflow-web-5b67b6b79c-6d7zc
+
 
 
 ################################# Config map #################################################
@@ -80,8 +80,49 @@ kubectl alpha debug -it pengfei-airflow-web-5b67b6b79c-6d7zc --image=busybox --t
 # create a config map from a directory of files
 kubectl create configmap dags-configmap --from-file=dags/
 
+# list all exsiting config map
+kubectl get configmap
+
 # describe an existing configmap
 kubectl describe configmaps dags-configmap
 
 # export a config map in yml format
 kubectl get configmaps dags-configmap -o yaml
+
+
+
+################################# secret ########################################
+
+# get scecret list
+kubectl get secrets -n argo
+
+
+################################# role and rolebinding ###################################
+# get all role
+kubectl get roles -a
+
+
+# get all rolebinding
+kubectl get rolebinding -A
+
+# get role/rolebinding of a namespace
+kubectl get roles/rolebinding -n user-pengfei
+
+kubectl describe roles
+
+############################## pod debug tools ###################################
+kubectl alpha debug -it pengfei-airflow-web-798ff4f645-64kjx --image=busybox --target=pengfei-airflow-web-798ff4f645-64kjx
+kubectl alpha debug -it pengfei-airflow-web-5b67b6b79c-6d7zc --image=busybox --target=pengfei-airflow-web-5b67b6b79c-6d7zc
+
+
+############################## kube argo workflow ###############################
+# get list of workflow run by argo
+kubectl get workflow
+
+# get details of a workflow
+kubectl describe workflow <work-flow-name>
+
+# apply a workflow by using a yaml file which describe the workflow dags
+kubectl apply -f example/workflow-hello.yaml 
+
+

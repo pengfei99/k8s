@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-vol-pod
+spec:
+  containers:
+    - name: test-container
+      image: k8s.gcr.io/busybox
+      command: [ "/bin/sh","-c","cat /etc/config/game.properties" ]
+      # mount an existing volume on the container 
+      volumeMounts:
+      - name: pengfei-volume
+        mountPath: /etc/config
+  # create a volume by using the config map
+  volumes:
+    # name of the volume
+    - name: pengfei-volume
+      configMap:
+        # name of the config map
+        name: game-config
+        items:
+          # key name
+        - key: game.properties
+          # path of the file which will contain the value of the key
+          path: game.properties
+        - key: ui.properties
+          path: ui.properties
+  restartPolicy: Never

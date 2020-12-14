@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-envfrom-pod
+spec:
+  containers:
+    - name: test-container
+      image: busybox
+      command: [ "/bin/sh", "-c", "env" ]
+      # In envFrom, we just put the name of the configMap, it will get all the key value pair and put it as evn var in the container
+      envFrom:
+      - configMapRef:
+        # name of the config map
+          name: game-config
+  restartPolicy: Never

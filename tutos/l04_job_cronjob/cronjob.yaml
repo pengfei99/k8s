@@ -1,0 +1,50 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: pengfei-cronjob-hello
+  labels:
+    app: pengfei-cronjob
+spec:
+  # schedule defines how the job repeats, it uses the same syntax as the crontab, first arg is second, 2nd arg is minutes, 3: hour, 4: day 5: month
+  # */1 means every second. If you want every second starts after 6 second, you write 6/1. 8/2 means every 2 second starts after 8 second
+  schedule: "*/1 * * * *"
+  # job template specify the job 
+
+   # It stands for the deadline in seconds for starting the job if it misses its scheduled time for any reason. After the deadline, 
+    # the cron job does not start the job. Jobs that do not meet their deadline in this way count as failed jobs. 
+    # If this field is not specified, the jobs have no deadline.
+  startingDeadlineSeconds: 10
+   # if the job is long to finish, the schedule may start a new job without finishing the old one. Thus you need to set a policy to allow concurrency or
+    # not.
+    # It has three possible values
+    # - "Allow" (default). 
+    # - "Forbid" Ignore the new schedule job until the old job finishes
+    # - "Replace" The new schedule job replaces the unfinish old job
+  concurrencyPolicy: Forbid
+
+  # You can suspend a job by setting suspend = true. default value is false
+  suspend: true 
+
+  # set the controller to save the number of succeed jobs, default value is 3
+  successfulJobsHistoryLimit: 10
+
+  # set the controller to save the number of failed jobs, default valie is 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      name: subjob
+      labels:
+        app: pengfei-cronjob-subjob
+    spec:
+    # template specify the pod of the job
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            imagePullPolicy: IfNotPresent
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+          restartPolicy: OnFailure

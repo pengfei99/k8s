@@ -1,0 +1,30 @@
+# specify your k8s cluster api version, you can get this info by using "kubectl api-versions" 
+apiVersion: v1
+# the type of k8s resources, e.g. Pod, Deployment, etc
+kind: Pod
+# metadata of your k8s objects
+metadata:
+# The name of your objects, here is the name of the pod
+  name: tomcat-server
+# in which name space you want to deploy this object, if empty the default namespace will be used
+  namespace: user-pengfei
+# spec of this pod
+spec:
+  containers:
+      # number 1 container
+     - name: pengfei-tomcat
+       image: tomcat
+       resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+       ports:
+       - containerPort: 8080
+       # If pull policy is set to IfNotPresent or Never, then a local image is used. The default value is Always
+       imagePullPolicy: Always
+   # number 2 container
+     - name: pengfei-mongo
+       image: mongo
+       ports:
+        - containerPort: 7501
+       imagePullPolicy: Always

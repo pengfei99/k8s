@@ -36,3 +36,5 @@ helm install pengfei-airflow ./airflow -f ./airflow/values.yml
 helm delete pengfei-airflow
 
 
+helm template 
+helm install dry-run

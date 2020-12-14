@@ -1,0 +1,18 @@
+# note the name of this file is mandatory. it must be kustomization.yaml. 
+# and the command kubectl apply -k <directory-name> only takes the name of the directory which contains kustomization.yaml
+configMapGenerator:
+- name: game-config-4
+  files:
+  # from files
+  - ./game-config/game.properties
+  - ./game-config/ui.properties
+  # from files with custom keys
+  - custom-key-name=./game-config/game.properties
+  # from literals
+  literals:
+  - special.how=very
+  - special.type=charm
+
+
+  
+  
