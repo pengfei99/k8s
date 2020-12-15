@@ -21,10 +21,5 @@ spec:
             configMapKeyRef:
               name: pengfei-config
               key: pengfei.sex
-        - name: FOOBAR_SEX
-          valueFrom:
-            configMapKeyRef:
-              name: pengfei-config
-              key: pengfei.sex
         
   restartPolicy: Never

@@ -6,7 +6,8 @@ spec:
   containers:
     - name: test-container
       image: k8s.gcr.io/busybox
-      command: [ "/bin/sh","-c","cat /etc/config/game.properties" ]
+      # let the container sleep for 600 sec to keep it running. So we can do kubectl exec on the container
+      command: [ "/bin/sh","-c","sleep 600" ]
       # mount an existing volume on the container 
       volumeMounts:
       - name: pengfei-volume

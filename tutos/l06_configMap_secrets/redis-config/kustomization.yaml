@@ -1,0 +1,11 @@
+# note the name of this file is mandatory. it must be kustomization.yaml. 
+# and the command kubectl apply -k <directory-name> only takes the name of the directory which contains kustomization.yaml
+configMapGenerator:
+- name: redis-config-cm
+  files:
+  # from files
+  - pengfei-redis-config=./redis-config.properties
+  
+
+  
+  
