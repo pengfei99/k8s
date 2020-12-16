@@ -114,6 +114,10 @@ kubectl describe roles
 kubectl alpha debug -it pengfei-airflow-web-798ff4f645-64kjx --image=busybox --target=pengfei-airflow-web-798ff4f645-64kjx
 kubectl alpha debug -it pengfei-airflow-web-5b67b6b79c-6d7zc --image=busybox --target=pengfei-airflow-web-5b67b6b79c-6d7zc
 
+############################## get events  ###################################
+# this will return some k8s api server message like unvalid env var in a pod is skipped
+kubectl get events
+
 
 ############################## kube argo workflow ###############################
 # get list of workflow run by argo
