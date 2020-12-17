@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-sub-dag-
+spec:
+  entrypoint: master
+  templates:
+  - name: worker
+    inputs:
+      parameters:
+      - name: message
+      - name: id
+    container:
+      image: busybox
+      command: [echo, "This is {{inputs.parameters.id}}, the message is {{inputs.parameters.message}}"]
+   # The master template defines the tasks and their relationships. 
+  - name: sub-master
+    dag:
+      tasks:
+      - name: preB-sub-task-1
+        template: worker
+        arguments:
+          parameters: [{name: message, value: preB-sub-task-1},{name: id,value: task_preB_sub_task_1}]
+      - name: preB-sub-task-2
+        dependencies: [preB-sub-task-1]
+        template: worker
+        arguments:
+          parameters: [{name: message, value: preB-sub-task-2},{name: id,value: task_preB_sub_task_2}]       
+  - name: master
+    dag:
+      tasks:
+      # A task needs to use another template to run
+      - name: task-A
+      # indicate the name of the template which will run the task
+        template: worker
+      # the parameters which will be used on the template  
+        arguments:
+          parameters: 
+          - name: message
+            value: A
+          - name: id
+            value: task_A
+      # this task calls a template which is also a dag      
+      - name: task-preB
+        template: sub-master
+        arguments:
+          parameters: [{name: message, value: preB},{name: id,value: task_preB}]
+      - name: task-B
+      # dependencies means the current task will start only if the dependent task finished correctly. 
+        dependencies: [task-A,task-preB]
+        template: worker
+        arguments:
+          parameters: [{name: message, value: B},{name: id,value: task_B}]
+      - name: task-C
+        dependencies: [task-A]
+        template: worker
+        arguments:
+          parameters: [{name: message, value: C},{name: id,value: task_C}]
+      - name: task-D
+        dependencies: [task-B, task-C]
+        template: worker
+        arguments:
+          parameters: [{name: message, value: D},{name: id,value: task_D}]

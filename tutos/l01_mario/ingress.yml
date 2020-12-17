@@ -7,9 +7,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - pengfei.demo.dev.sspcloud.fr
+        - pengfei.kub.sspcloud.fr
   rules:
-    - host: pengfei.demo.dev.sspcloud.fr
+    - host: pengfei.kub.sspcloud.fr
       http:
         paths:
           - path: /

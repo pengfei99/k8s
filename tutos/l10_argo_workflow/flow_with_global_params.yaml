@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-global-parameters-
+spec:
+  entrypoint: worker1
+  # the parameter here is a global variable, every template can use it
+  arguments:
+    parameters:
+    - name: log-level
+      value: INFO
+
+  templates:
+  - name: worker1
+    container:
+      image: busybox
+      env:
+      - name: LOG_LEVEL
+      # you can inovke the global params by using workflow.parameterss.
+        value: "{{workflow.parameters.log-level}}"
+      command: ["echo" ,"This is worker 1 and log level is $(LOG_LEVEL)"]
+  - name: worker2
+    container:
+      image: busybox
+      env:
+      - name: LOG_LEVEL
+        value: "{{workflow.parameters.log-level}}"
+      command: ["echo" ,"This is worker 2 and log level is $(LOG_LEVEL)"]

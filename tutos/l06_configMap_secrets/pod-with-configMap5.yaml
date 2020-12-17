@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-dag-vol
+spec:
+  containers:
+    - name: test-container
+      image: ubuntu
+      # let the container sleep for 600 sec to keep it running. So we can do kubectl exec on the container
+      command: [ "/bin/sh","-c","sleep 600" ]
+      # mount an existing volume on the container 
+      volumeMounts:
+      - name: dag-volume
+        mountPath: /etc/airflow/dags
+  # create a volume by using the config map
+  volumes:
+    # name of the volume
+    - name: dag-volume
+      configMap:
+        # name of the config map
+        name: dags-configmap
+        items:
+          # key name
+        - key: exp1.py
+          # path of the file which will contain the value of the key
+          path: exp1.py
+  restartPolicy: Never

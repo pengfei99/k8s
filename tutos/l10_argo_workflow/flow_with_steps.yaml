@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-steps-
+spec:
+  entrypoint: master
+  # Global vars are always overwrite by local vars
+  arguments:
+    parameters:
+    - name: message
+      value: "default value"
+
+  # This spec contains two templates: master and worker
+  templates:
+  - name: master
+    # Instead of just running a container
+    # This template has a sequence of steps. The order of these steps is the order of their execution
+    # If you use - - means steps are executed sequentially.
+    # If you use   - means steps are executed parallelly. 
+    steps:
+    - - name: step-a           # step-a is run before the following steps
+        template: worker
+        # local variables
+        arguments:
+          parameters:
+          - name: message
+            value: "I'm step A"
+    - - name: step-b           # step-b run after previous step
+        template: worker
+        arguments:
+          parameters:
+          - name: message
+            value: "I'm step B"
+      - name: step-c           # step-c run in parallel with step-b but after step-a
+        template: worker
+        arguments:
+          parameters:
+          - name: message
+            value: "I'm step C"
+    - - name: step-d
+        template: worker
+        arguments:
+          parameters:
+          - name: message
+            value: "I'm step d"
+
+  # This is the actual template that will print the message defined in the master template steps
+  - name: worker
+    inputs:
+      parameters:
+      - name: message
+    container:
+      image: docker/whalesay
+      command: [cowsay]
+      args: ["{{inputs.parameters.message}}"]

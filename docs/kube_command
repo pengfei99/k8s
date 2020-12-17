@@ -64,7 +64,7 @@ kubectl exec --stdin --tty pengfei-airflow-web-798ff4f645-fffqq -- /bin/bash
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow 8080:8080
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow-postgresql 5432:5432
 
-
+kubectl port-forward --namespace user-pengfei svc/argo-artifacts 9000:9000
 ################################### Ingress #################################################
 # show short ingress description
 kubectl get ingress
