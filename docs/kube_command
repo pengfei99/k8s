@@ -57,7 +57,13 @@ kubectl get secret --namespace user-pengfei pengfei-airflow-postgresql -o jsonpa
 kubectl get secret --namespace user-pengfei pengfei-airflow-redis -o jsonpath="{.data.redis-password}" | base64 --decode
 
 ##################################### Get a pod shell ###########################################
-kubectl exec --stdin --tty pengfei-airflow-web-798ff4f645-fffqq -- /bin/bash
+# if your pod has only one container, this will get a shell of that container. If your pod has multiple contianer, it will get the default container's shell
+# here pengfei-airflow-web is the name of the pod
+kubectl exec --stdin --tty pengfei-airflow-web -- /bin/bash
+
+# if you want to get a specific containter of your pod, you can use the following command.
+# here pod-with-empty-dir is the name of the pod, reader-container is the name of the container
+kubectl exec --stdin --tty pod-with-empty-dir --container reader-container -- /bin/sh
 
 ################################### port forward a servcie to localhost ########################
 
@@ -71,8 +77,6 @@ kubectl get ingress
 
 # show detailed ingress description
 kubectl describe ingress
-
-
 
 
 ################################# Config map #################################################

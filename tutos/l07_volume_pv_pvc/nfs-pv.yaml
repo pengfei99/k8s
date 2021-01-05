@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+# pv name
+  name: pv0003
+spec:
+# pv capacity
+  capacity:
+    storage: 5Gi
+# volume mode defines how the PV is mounted on a pod, only two possible value: Filesystem, Block
+# Filesystem mode: PV is mounted into Pods as a directory. If the PV is backed by a block device and the device is empty, 
+#                  Kuberneretes creates a filesystem on the device before mounting it for the first time.
+# Block mode: PV is mounted into a Pod as a block device, without any filesystem on it. This mode is useful to provide a Pod 
+#             the fastest possible way to access a volume, without any filesystem layer between the Pod and the volume.
+#             On the other hand, the application running in the Pod must know how to handle a raw block device.
+  volumeMode: Filesystem
+# pv access mode, only the following three is available
+# ReadWriteOnce -- the volume can be mounted as read-write by a single node
+# ReadOnlyMany -- the volume can be mounted read-only by many nodes
+# ReadWriteMany -- the volume can be mounted as read-write by many nodes
+  accessModes:
+    - ReadWriteOnce
+# pv relcaim policy
+  persistentVolumeReclaimPolicy: Delete
+# storage class can be used by a pvc to bind with this pv
+  storageClassName: slow
+# nfs specific config
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /tmp
+    server: 172.17.0.2

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-host-path
+spec:
+  volumes:
+  - name: test-volume
+    hostPath:
+      # directory location on host
+      path: /tmp
+      # this field is optional
+      type: Directory
+  containers:
+  - image: k8s.gcr.io/test-webserver
+    name: test-container
+    command: [ "/bin/sh","-c"]
+    args: ["echo \"toto titi tata\" > /test-pd/hello.txt; cat /test-pd/hello.txt && sleep 600"]
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+    resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+  

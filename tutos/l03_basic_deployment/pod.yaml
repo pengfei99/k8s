@@ -25,6 +25,10 @@ spec:
    # number 2 container
      - name: pengfei-mongo
        image: mongo
+       resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
        ports:
         - containerPort: 7501
        imagePullPolicy: Always

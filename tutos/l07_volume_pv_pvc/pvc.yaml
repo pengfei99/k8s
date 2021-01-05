@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+# used to bind PV with the same class name, if you want the DefaultStorageClass create a PV dynamically, just put "".
+  storageClassName: rook-ceph-block
+
+# Only the volumes whose labels match the selector can be bound to the PVC. The selector can consist of two fields:
+# - matchLabels: the volume must have a label with this value
+# - matchExpressions: a list of requirements made by specifying key, list of values, and operator that relates the key and values. 
+#                     Valid operators include In, NotIn, Exists, and DoesNotExist.
+# because of this selector, this pvc will always pending if you don't have a PV that matches the selector
+# you can comment the selector, if you want to test the default storage class
+  # selector:
+  #   matchLabels:
+  #     release: "stable"
+  #   matchExpressions:
+  #     - {key: environment, operator: In, values: [dev]}
+---
+# This pod use the above pvc as volume
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-pvc
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: my-volume
+# create a volume by using a pvc
+  volumes:
+    - name: my-volume
+      persistentVolumeClaim:
+        claimName: myclaim

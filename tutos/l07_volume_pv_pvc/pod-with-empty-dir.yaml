@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-empty-dir
+spec:
+# We create a volume called temp-volume. This volume has type emptyDir
+  volumes:
+  - name: temp-volume
+    emptyDir: {}
+  containers:
+  # The writer container writes the env var to file
+  - name: writer-container
+    image: busybox
+    # We create a env var called MESSAGE
+    env:
+    - name: MESSAGE
+      value: "hello world"
+    # The command overwrites the default commands of the docker image
+    command: [ "/bin/sh","-c"]
+    # The args overwrites the default arguments of the docker image
+    # The following args is a shell script, we use ; to separate commands. && is used as condition, it means if cat /tmp/hello.txt
+    # runs correctly and returns 0 then exec sleep 600. If not, sleep will be omitted.
+    args: ["echo \"${MESSAGE}\" > /tmp/hello.txt; cat /tmp/hello.txt && sleep 600"]
+    # We mount the volume called temp-volume at /tmp
+    volumeMounts:
+    - mountPath: /tmp
+      name: temp-volume
+    resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"  
+# The reader container reads the file that writes by the writer-container. It means the volume is shared between containers in a pod
+  - name: reader-container
+    image: busybox
+    # The command overwrites the default commands of the docker image
+    command: [ "/bin/sh","-c"]
+    # The args overwrites the default arguments of the docker image
+    # The first echo will do nothing, because no env var is defined in this container
+    args: ["echo \"${MESSAGE}\"; cat /cache/hello.txt && sleep 600"]
+    # We mount the volume called temp-volume at /cache
+    volumeMounts:
+    - mountPath: /cache
+      name: temp-volume
+    resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+  
+  

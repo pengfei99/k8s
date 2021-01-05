@@ -13,7 +13,7 @@ spec:
           s3:
             endpoint: 10.233.22.96:9000
             bucket: argo-repo
-            key: my-input-artifact.tgz
+            key: argo-repo/tmp/my-output-artifact.tgz
             accessKeySecret:
               name: pengfei-private-minio-secret
               key: accessKey
@@ -34,7 +34,7 @@ spec:
           # gzipped before saving. So as a best practice, .tgz or .tar.gz
           # should be incorporated into the key name so the resulting file
           # has an accurate file extension.
-            key: my-output-artifact.tgz
+            key: argo-repo/tmp/my-output-artifact.tgz
             accessKeySecret:
               name: pengfei-private-minio-secret
               key: accessKey
