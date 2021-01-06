@@ -7,6 +7,9 @@ kubectl apply -f deployment.yml
 kubectl apply -f service.yml
 kubectl apply -f .
 
+################################### restart a deployment ####################################################
+kubectl rollout restart deployment.apps/opa -n opa
+
 ################################## view existing resource #######################################
 
 # get all deployed pods

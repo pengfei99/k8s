@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    # if you want to use this config map by default - name it "artifact-repositories" 
+  name: artifact-repositories
+  annotations:
+    # if you want to use a specific key, put that's key into this annotation 
+    workflows.argoproj.io/default-artifact-repository: default-v1
+data:
+  default-v1: |
+    s3:
+      bucket: argo-artifacts
+      endpoint: https://minio.lab.sspcloud.fr
+      accessKeySecret:
+        name: prod-minio-cred
+        key: accessKey
+      secretKeySecret:
+        name: prod-minio-cred
+        key: secretKey

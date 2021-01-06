@@ -3,6 +3,11 @@ kind: Workflow
 metadata:
   generateName: flow-with-artifact-
 spec:
+# set artifact repo ref
+  artifactRepositoryRef:
+  # default is "artifact-repositories"
+    configMap: artifact-repositories 
+    key: default-v1 
   entrypoint: artifact-example
   templates:
   - name: artifact-example
@@ -21,7 +26,8 @@ spec:
   - name: artifact1
     container:
       image: busybox
-      command: ["cat","hello world", ">>", "/tmp/hello_world.txt" ]
+      command: [ "/bin/sh","-c"]
+      args: ["echo \"hello world\" > /tmp/hello.txt;"]
       # While by default, the Docker and PNS workflow executors can get output artifacts from the base layer (e.g. /tmp), 
       # neither the Kubelet or the K8SAPI executors can. 
       # So if you do as the argo workflow official artifact example which output artifacts directly to /tmp, you will get an error. 
@@ -29,7 +35,7 @@ spec:
       # mount the volume on /mnt/out
       volumeMounts:
         - name: out
-          mountPath: /mnt/out
+          mountPath: /tmp
     # create an empty volume to output the artifacts 
     volumes:
       - name: out
@@ -39,7 +45,7 @@ spec:
       # generate hello-art artifact from /tmp/hello_world.txt
       # artifacts can be directories as well as files
       - name: hello-art
-        path: /mnt/out/hello_world.txt
+        path: /tmp/hello.txt
 
   - name: print-message
     inputs:
