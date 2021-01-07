@@ -1,0 +1,108 @@
+# Output parameters provide a general mechanism to use the result of a step as a parameter rather than as an artifact. 
+# This allows you to use the result from any type of step, not just a script, for conditional tests, loops, and arguments
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-output-parameters-
+spec:
+  entrypoint: master-task
+  templates:
+  # dag template which will coordinates the whole workflow
+  - name: master-task
+    dag:
+      tasks:
+      # task 1-1 generate random number
+      - name: gen-val-1
+        template: gen-random-int-python
+      # task 1-2 generate random number
+      - name: gen-val-2
+        template: gen-random-int-python
+      # task 1-3 generate random number
+      - name: gen-val-3
+        template: gen-random-int-python
+
+      # task 2 write the three generated random numbers to a file
+      - name: save-val-to-file
+        dependencies: [gen-val-1,gen-val-2,gen-val-3]
+        template: output-param
+        arguments:
+          parameters: 
+          - name: random-val-1
+          # the value is from task "generate-random-value-1", as the template of this task is a script. So the the output is in outputs.result
+            value: "{{tasks.gen-val-1.outputs.result}}"
+          - name: random-val-2
+          # the value is from task "generate-random-value-2", as the template of this task is a script. So the the output is in outputs.result
+            value: "{{tasks.gen-val-2.outputs.result}}"
+          - name: random-val-3
+          # the value is from task "generate-random-value", as the template of this task is a script. So the the output is in outputs.result
+            value: "{{tasks.gen-val-3.outputs.result}}"
+
+     # task 3 is a sub master which contains multiple steps
+      - name: transform-value
+        dependencies: [save-val-to-file]
+        template: transform-value-template
+        arguments:
+          parameters: 
+          - name: all-val
+          # the value is from task "generate-random-value-1", as the template of this task is a script. So the the output is in outputs.result
+            value: "{{tasks.save-val-to-file.outputs.parameters.random-val}}"
+    
+# list of worker template which runs actual job on pods
+# template of taks 1
+  - name: gen-random-int-python
+    script:
+      image: python:alpine3.8
+      command: [python]
+      source: |
+        import random
+        i = random.randint(1, 100)
+        print(i)
+
+# template of task 2 
+  - name: output-param
+    inputs:
+      parameters:
+      - name: random-val-1
+      - name: random-val-2
+      - name: random-val-3
+    container:
+      image: busybox
+      command: [sh, -c]
+      args: ["echo {{inputs.parameters.random-val-1}} {{inputs.parameters.random-val-2}} {{inputs.parameters.random-val-3}} > /tmp/value.txt"]  # generate the content of hello_world.txt
+      volumeMounts:
+        - name: out
+          mountPath: /tmp
+    outputs:
+      parameters:
+      - name: random-val     # name of output parameter
+        valueFrom:
+          path: /tmp/value.txt    # set the output object random-val-param to the contents of file value.txt
+
+# template of task 3
+  - name: transform-value-template
+    inputs:
+      parameters:
+      - name: all-val
+    steps:
+    - - name: step-a           
+        template: print-message
+        arguments:
+          parameters:
+          # Pass the hello-param output from the generate-parameter step as the message input to print-message
+          - name: message
+            value: "{{inputs.parameters.all-val}}"
+
+  - name: print-message
+    inputs:
+      parameters:
+      - name: message
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo result was: {{inputs.parameters.message}}"]
+
+  
+
+  volumes:
+      - name: out
+        emptyDir: { }
