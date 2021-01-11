@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: my-db-service
+subsets:
+# the ip an port of the actual source, in our example, this should be the ip and port of the database cluster
+  - addresses:
+      - ip: 192.0.2.42
+    ports:
+      - port: 5432

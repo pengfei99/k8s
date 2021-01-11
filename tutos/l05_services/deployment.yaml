@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: static-web
+  template:
+    metadata:
+      labels:
+        app: static-web
+    spec:
+      containers:
+        - name: static-site
+          image: dockersamples/static-site
+          imagePullPolicy: IfNotPresent
+          # note if the image only listens to port 80, and you set other port below, the container will not work
+          ports:
+            - name: http
+              containerPort: 80
+          

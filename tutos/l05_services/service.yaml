@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+# service name
+metadata:
+  name: static-web-service
+spec:
+  type: ClusterIP
+# service selector will link targets pod to this service
+# In this example, all pods with label app=static-web will be linked to this service
+  selector:
+    app: static-web
+# ports specify how service port will match to pod's port
+# In this example, the service listens to port 80, and forward the query to pod's port 80
+# by using tcp protocol.
+  ports:
+  # The default protocol is TCP, and UDP, SCTP is also supported
+    - protocol: TCP
+      port: 80
+      targetPort: 80
