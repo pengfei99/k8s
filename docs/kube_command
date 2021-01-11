@@ -71,6 +71,8 @@ kubectl exec --stdin --tty pod-with-empty-dir --container reader-container -- /b
 ################################### port forward a servcie to localhost ########################
 
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow 8080:8080
+# The first port number(80) is the port of the service. The second port number(8080) is the port forward on your local machine
+kubectl port-forward --namespace user-pengfei svc/static-web-service 80:8080
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow-postgresql 5432:5432
 
 kubectl port-forward --namespace user-pengfei svc/argo-artifacts 9000:9000
@@ -80,6 +82,7 @@ kubectl get ingress
 
 # show detailed ingress description
 kubectl describe ingress
+
 
 
 ################################# Config map #################################################
