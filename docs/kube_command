@@ -1,5 +1,6 @@
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
+
 ################################### resource creation (pods, services)#############################################
 
 # install a pod/service by using a config file
@@ -140,3 +141,9 @@ kubectl describe workflow <work-flow-name>
 kubectl apply -f example/workflow-hello.yaml 
 
 
+################################ Run pod as interactive shell #############################
+# run a pod and get an interactive shell in a namespace
+kubectl run -i --tty busybox --image=busybox --restart=Never -- sh -n user-pengfei
+kubectl run --rm utils -it --image eddiehale/utils --restart=Never bash 
+# if you want to output the generated spec to a file
+kubectl run -i --tty busybox --image=busybox --restart=Never -- sh -n user-pengfei --dry-run -o yaml > pod.yaml

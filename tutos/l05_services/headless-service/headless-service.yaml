@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-service
+spec:
+# if we don't specify a type. "type: ClusterIP" will be set as default. 
+# Here we set cluterIP type with None to indicate this is a 
+  clusterIP: None # <-- Don't forget!!
+  selector:
+    app: api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+# After we apply the three above files. We can first check the created services
+# $ kubectl get svc -n user-pengfei
+
+# headless-service                      ClusterIP   None            <none>        80/TCP     11m
+# normal-service                        ClusterIP   10.233.22.13    <none>        80/TCP     11m
+
+# You can notice that headless-service does not have cluster IP. But you can still call this service on the network.
+
+# For example, we create a new pod called utils. And we will try ns-lookup in this pod to check normal-service and headless-service
+
+# this command creat a pod and return an interactive shell 
+# $ kubectl run --rm utils -it --image eddiehale/utils --restart=Never bash
+# If you don't see a command prompt, try pressing enter.
+# root@utils:/# nslookup normal-service
+# Server:		169.254.25.10
+# Address:	169.254.25.10#53
+
+# Name:	normal-service.user-pengfei.svc.cluster.local
+# Address: 10.233.56.36
+
+# root@utils:/# nslookup headless-service
+# Server:		169.254.25.10
+# Address:	169.254.25.10#53
+
+# Name:	headless-service.user-pengfei.svc.cluster.local
+# Address: 10.233.119.4
+# Name:	headless-service.user-pengfei.svc.cluster.local
+# Address: 10.233.118.251
+# Name:	headless-service.user-pengfei.svc.cluster.local
+# Address: 10.233.104.4
+# Name:	headless-service.user-pengfei.svc.cluster.local
+# Address: 10.233.86.86
+# Name:	headless-service.user-pengfei.svc.cluster.local
+# Address: 10.233.121.127
+
+# You can notice, the normal service has only one IP which will be used as a load balancer to redirect queries to the pod. 
+# The headless service does not have IP, but directly expose the ip of the pods.
