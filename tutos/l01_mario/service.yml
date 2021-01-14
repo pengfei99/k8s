@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: mario
 spec:
+  type: ClusterIP
   ports:
     - name: http
       targetPort: 8080

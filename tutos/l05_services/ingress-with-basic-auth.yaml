@@ -1,0 +1,40 @@
+# we can create a basic auth file by using the following command
+# htpasswd -c auth pengfei
+# here auth is the output file name, pengfei is the user login. In the popup
+# you need to give a password. 
+# Note htpasswd is a bin from httpd. So you need to install httpd first.
+
+# Now we have the auth file, we need to add it to k8s secret with the following command
+# kubectl create secret generic staic-web-basic-auth --from-file=auth
+# here staic-web-basic-auth is the name of the secret
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress-with-auth
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # The following auth config will add a authentication to your service
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: staic-web-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication required"
+spec:
+# This tls config makes the ingress backend generate tls resolution for your service
+  tls:
+    - hosts:
+        - test-ingress.kub.sspcloud.fr
+  rules:
+  # specify the url of your ingress service
+    - host: test-ingress.kub.sspcloud.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            # specify which service the ingress match should redirect the query
+              service:
+                name: static-web-service
+                port:
+                  number: 80
+
+# It supports other type of auth, for example oauth, https://kubernetes.github.io/ingress-nginx/examples/auth/oauth-external-auth/

@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+# This tls config makes the ingress backend generate tls resolution for your service
+  tls:
+    - hosts:
+        - test-ingress.kub.sspcloud.fr
+  rules:
+  # specify the url of your ingress service
+    - host: test-ingress.kub.sspcloud.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            # specify which service the ingress match should redirect the query
+              service:
+                name: static-web-service
+                port:
+                  number: 80
+# you can use command kubectl get ingress to check the created ingress service
+# you shoul see the following line
+# test-ingress      <none>   test-ingress.kub.sspcloud.fr   10.233.13.191   80, 443   2m18s

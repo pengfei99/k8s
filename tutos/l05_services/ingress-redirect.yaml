@@ -1,0 +1,18 @@
+# we can also redirect the query to another ingress service not to a k8s service
+# In this example, we create a ingress which redirect all queries to re-ingress to test-ingress
+# because re-ingress does not match any k8s service. So it does not have the http.path.* to specify the matched service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: https://test-ingress.kub.sspcloud.fr
+spec:
+# This tls config makes the ingress backend generate tls resolution for your service
+  tls:
+    - hosts:
+        - re-ingress.kub.sspcloud.fr
+  rules:
+  # specify the url of your ingress service
+    - host: re-ingress.kub.sspcloud.fr
+           

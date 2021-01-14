@@ -1,18 +1,19 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mario
-  annotations:
-    kubernetes.io/ingress.class: nginx
+  name: ingress-mario
 spec:
-  tls:
-    - hosts:
-        - pengfei.kub.sspcloud.fr
+  # tls:
+  #   - hosts:
+  #       - mario.kub.sspcloud.fr
   rules:
-    - host: pengfei.kub.sspcloud.fr
+    - host: mario.kub.sspcloud.fr
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: mario
-              servicePort: http
+              service:
+                name: mario
+                port: 
+                  number: 80

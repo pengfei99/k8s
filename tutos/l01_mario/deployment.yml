@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: mario
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: mario
@@ -15,4 +15,7 @@ spec:
       containers:
         - name: mario
           image: pengbai/docker-supermario
+          ports:
+            - name: http
+              containerPort: 8080
 
