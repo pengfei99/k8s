@@ -1,0 +1,9 @@
+---
+# This storage class is an example of setting up storage on a minikube cluster
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+provisioner: k8s.io/minikube-hostpath
+parameters:
+  type: pd-ssd
