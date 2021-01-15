@@ -1,0 +1,73 @@
+# a headless service to access pods in the statefulset
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-svc
+  # label of the service
+  labels:
+    app: pengfei-ss-test
+spec:
+  ports:
+  # name of the port can be ommited
+  - port: 80
+  clusterIP: None
+  selector:
+    app: pengfei-web # has to match .spec.template.metadata.labels of the target statefulsets
+---
+# note the .spec.template.metadata.labels is very important. Its the primary id
+# of the pod. The StatefulSet will use selector to find all pods belongs to it
+# The service(endpoints) also use the selector match labels to find all pods. 
+# If the name does not match in the selecor and pod label. The service (endpoints)
+# finds 0 pod.
+apiVersion: apps/v1
+kind: StatefulSet
+# The name of the StatefulSet, Pods in a stateful set will take the name <ss-name>-<ordinal>
+# In this example, the pod name will be web-0, web-1, web-3
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: pengfei-web # has to match .spec.template.metadata.labels
+  # define the governing service of this statefulset
+  serviceName: web-svc
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+    # The label of pods is very important, because the name of the pod is generated and different from each other
+    # so we can't find all pods of the same spec with their names, but we can with their labels
+      labels:
+        app: pengfei-web # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: httpd
+        image: httpd:2.4
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+# volumeClaimTemplate allows you to create persistentVolumeClaim inside a statefulset spec
+# It's equivalent to create a PVC, create a volume matches pvc then mount the volume to the pod.
+
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: rook-ceph-block
+      resources:
+        requests:
+          storage: 1Gi
+
+# get a shell of a pod
+# kubectl exec -it web-0 -- bash
+# install curl
+# apt update && apt install curl
+# query the service
+# curl web-svc
+# <html><body><h1>It works!</h1></body></html>
+# The headless service allows you to connect to all pods that in the service endpoints
+# via <pod-name>.<service-name> 
+# For example : curl web-1.web-svc 
