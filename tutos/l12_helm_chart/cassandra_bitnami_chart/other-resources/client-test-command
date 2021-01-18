@@ -1,6 +1,8 @@
-# 
-# kubectl run --namespace user-pengfei my-release-cassandra-client --rm --tty -i --restart='Never' --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD --image docker.io/bitnami/cassandra:3.11.9-debian-10-r30 -- bash
+# run a pod as cassandra client 
+kubectl run --namespace user-pengfei my-release-cassandra-client --rm --tty -i --restart='Never' --env CASSANDRA_PASSWORD=test --image docker.io/bitnami/cassandra:3.11.9-debian-10-r30 -- bash
 
+# connect to a cassandra cluster. here pengfei-cassandra is the name of your cassandra cluster service
+cqlsh -u cassandra -p $CASSANDRA_PASSWORD pengfei-cassandra
 
 # create a key space
 CREATE KEYSPACE test WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
