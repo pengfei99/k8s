@@ -1,0 +1,8 @@
+apiVersion: v2
+name: cassandra
+version: 1.0.0
+dependencies:
+  - name: cassandra
+    version: 7.1.2
+    repository: https://charts.bitnami.com/bitnami
+    enabled: true

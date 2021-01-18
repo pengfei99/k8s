@@ -1,0 +1,61 @@
+cassandra:
+
+  ##################### image conf #######################################
+  image:
+    registry: docker.io
+    repository: bitnami/cassandra
+    ## Bitnami Cassandra image tag
+    ## ref: https://github.com/bitnami/bitnami-docker-cassandra#supported-tags-and-respective-dockerfile-links
+    tag: 3.11.9-debian-10-r52
+    pullPolicy: IfNotPresent
+    debug: false
+  
+  ##################### Service conf ####################################
+  service:
+    ## Service type
+    type: ClusterIP
+    ## CQL port
+    port: 9042
+    ## Thrift Client API port
+    thriftPort: 9160
+    ## Metrics port
+    metricsPort: 8080
+
+  ################### Number of Cassandra replicas to deploy.##############
+  replicaCount: 3
+
+  ################## Define updateStrategy for Cassandra statefulset ##########
+  updateStrategy: RollingUpdate
+
+  ######################### PVC conf ###################################### 
+  persistence:
+    ## If true, use a Persistent Volume Claim, If false, use emptyDir
+    ## Enable persistence using default Persistent Volume Claims. In our case, it's rook-ceph-block
+    enabled: true
+    ## Persistent Volume Access Mode
+    accessModes:
+      - ReadWriteOnce
+    ## Persistent Volume size
+    size: 64Gi
+    ## The path the volume will be mounted at
+    mountPath: /bitnami/cassandra
+
+  ######################## Database credentials ###############################
+  dbUser:
+    user: cassandra
+    forcePassword: true
+    password: test
+
+  ###################### cassandra Cluster parameters #######################
+  cluster:
+    name: cassandra
+    seedCount: 2
+    numTokens: 256
+    datacenter: dc1
+    rack: rack1
+    enableRPC: true
+    endpointSnitch: SimpleSnitch
+    ## Encryption values. NOTE: They require tlsEncryptionSecretName
+    ##
+    internodeEncryption: none
+    clientEncryption: false

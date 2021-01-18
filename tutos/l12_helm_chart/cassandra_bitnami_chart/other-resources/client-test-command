@@ -1,0 +1,17 @@
+# 
+# kubectl run --namespace user-pengfei my-release-cassandra-client --rm --tty -i --restart='Never' --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD --image docker.io/bitnami/cassandra:3.11.9-debian-10-r30 -- bash
+
+
+# create a key space
+CREATE KEYSPACE test WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+
+# show all keyspaces;
+DESCRIBE keyspaces;
+
+# use a keyspaces
+USE test;
+
+
+# alter a keyspaces
+ALTER KEYSPACE tutorialspoint
+WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};
