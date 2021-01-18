@@ -37,4 +37,7 @@ helm delete pengfei-airflow
 
 
 helm template 
-helm install dry-run
+
+############################## Get the generated manifests of a release ###########################################
+# To check the generated manifests of a release without installing the chart, the '--debug' and '--dry-run' flags can be combined.
+helm install --debug --dry-run my-release bitnami/cassandra
