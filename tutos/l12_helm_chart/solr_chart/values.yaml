@@ -1,0 +1,91 @@
+solr:
+  ############### image conf ######################
+  image:
+    registry: docker.io
+    repository: solr
+    tag: 8.7.0
+    pullPolicy: IfNotPresent
+
+  ################## Solr settings #################
+  port: 8983
+
+  ################# Settings for solr jvm memory ############
+  # Xms represents the initial size of total heap space
+  # Xmx represents the maximum size of total heap space 
+  javaMem: "-Xms2g -Xmx4g"
+
+  # Sets the termination Grace period for the solr pods, because it can take a while for shards to elect new leaders
+  terminationGracePeriodSeconds: 180
+
+  # The log level of the Solr instances
+  logLevel: "INFO"
+
+  # Solr pod disruption budget
+  # https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    maxUnavailable: 1
+
+  # Number of replicas
+  replicaCount: 3
+
+  updateStrategy:
+    type: RollingUpdate
+  
+  ######################### PVC conf ###################################### 
+  volumeClaimTemplates:
+    ## solr data Persistent Volume Storage Class
+    storageClassName: rook-ceph-block
+    accessModes:
+      - "ReadWriteOnce"
+    ## PersistentVolumeClaim size
+    storageSize: 40Gi
+
+  ######################### ingress conf ###################################### 
+  ingress:
+    # enable ingress record generation
+    enabled: true
+
+    ## Set this to true in order to add the corresponding annotations for cert-manager
+    certManager: false
+
+    ## Ingress Path type
+    pathType: ImplementationSpecific
+
+
+    ## When the ingress is enabled, a host pointing to this will be created
+    hostname: solr.kub.sspcloud.fr
+
+    ## The Path to Solr. You may need to set this to '/*' in order to use this
+    ## with ALB ingress controllers.
+    path: /
+    
+    ## Enable TLS configuration for the hostname defined at ingress.hostname parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: {{- printf "%s-tls" .Values.ingress.hostname }}
+    ## You can use the ingress.secrets parameter to create this TLS secret or relay on cert-manager to create it
+    tls: false
+    secrets: []
+    ## - name: solr.local-tls
+    ##   key:
+    ##   certificate:
+    
+  ########################## Configure liveness and readiness probes #################
+  ## This applies to all the Solr in the sharded cluster
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 45
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+  ######################### zk conf ###################################### 
+  zookeeper:
+    replicaCount: 3
+    fourlwCommandsWhitelist: "srvr, mntr, ruok, conf"
