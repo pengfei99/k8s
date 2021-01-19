@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-atlas
+spec:
+  tls:
+    - hosts:
+        - atlas.lab.sspcloud.fr
+  rules:
+    - host: atlas.lab.sspcloud.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: atlas-test-atlas
+                port: 
+                  number: 21000
