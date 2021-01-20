@@ -1,0 +1,14 @@
+# you can get the zk java client here https://zookeeper.apache.org/releases.html
+
+# to connecto to a zk server
+bin/zkCli.sh -server localhost:2181
+
+# set the path /security.json with the json file content
+set /security.json '{"authentication":{"class":"solr.BasicAuthPlugin","credentials":{"solr":"F2A0any174WhnvB6sU8iFbafRYCuozBIxCF/a2xP73g= iJuIbOaDjEdtsLh+C47CFlLzR5lklk3K5LM9MHpHIpA="}},"authorization":{"class":"solr.RuleBasedAuthorizationPlugin","user-role":{"solr":"admin"}, "permissions":[{"name":"all","role":"admin"}]}}'
+
+# copy a local file to zk server
+bin/zkCli.sh -server localhost:2181 -cmd put /security.json \
+'{"authentication":{"class":"solr.BasicAuthPlugin","credentials":{"solr":"F2A0any174WhnvB6sU8iFbafRYCuozBIxCF/a2xP73g= iJuIbOaDjEdtsLh+C47CFlLzR5lklk3K5LM9MHpHIpA="}},"authorization":{"class":"solr.RuleBasedAuthorizationPlugin","user-role":{"solr":"admin"}, "permissions":[{"name":"all","role":"admin"}]}}'
+
+# if the file is too long, you can use the solr command
+bin/solr zk cp file:/home/pliu/git/k8s/tutos/l12_helm_chart/solr_chart/other-resources/security.json zk:/security.json -z localhost:8983

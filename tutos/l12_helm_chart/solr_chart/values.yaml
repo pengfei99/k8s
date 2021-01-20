@@ -3,6 +3,7 @@ solr:
   image:
     registry: docker.io
     repository: solr
+    # solr application version is 8.7.0
     tag: 8.7.0
     pullPolicy: IfNotPresent
 
@@ -71,14 +72,14 @@ solr:
   ########################## Configure liveness and readiness probes #################
   ## This applies to all the Solr in the sharded cluster
   livenessProbe:
-    enabled: true
+    enabled: false
     initialDelaySeconds: 45
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
   readinessProbe:
-    enabled: true
+    enabled: false
     initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 5

@@ -1,0 +1,23 @@
+{"authentication":{
+    "class":"solr.BasicAuthPlugin",
+    "credentials":{"solr":"F2A0any174WhnvB6sU8iFbafRYCuozBIxCF/a2xP73g= iJuIbOaDjEdtsLh+C47CFlLzR5lklk3K5LM9MHpHIpA=",
+                   "atlas":"u7PuIas2S4UlFXQ4oKRuMtj58JJudhea1IosaaLzAQo= lraiZhXcqhg1yG5mnJsBY2ED7XMh1kHJxb5tnzAo0FY=",
+                   "pliu":"u6YpOFoTmXenLcOubKBIQyqP/8R2EHb97xzU7+pOWqA= ZNsThdwIewYEvsUTwftdBAziIWOgt5dUTu/CwAs7isI="
+                }
+    },
+    "authorization":{
+    "class":"solr.RuleBasedAuthorizationPlugin",
+    "user-role":{"solr":"admin","atlas":"admin","pliu":"dev"},
+    "permissions":[
+                   {"name":"read","role":"*"},
+                   {"name":"schema-read","role":"*"},
+                   {"name":"config-read","role":"*"},
+                   {"name":"collection-admin-read","role":"*"},
+                   {"name":"metrics-read","role":"*"},
+                   {"name":"core-admin-read","role":"*"},
+                   {"name":"all","role":"admin"},
+                   {"name":"secure-collection1-permission","collection":"securecollection","path":"/select","before": "collection-admin-read","role": "admin"}
+                ]
+    }}
+
+    
