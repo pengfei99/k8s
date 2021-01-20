@@ -25,5 +25,10 @@ curl -X POST -u solr:pwd --header 'Content-Type:text/xml' -d @config.zip 'http:/
 curl -X POST -u solr:pwd --header 'Content-Type:text/xml' -d @config.zip 'http://solr.kub.sspcloud.fr/solr/admin/configs?action=CREATE&name=fulltext_index'
 
 # list existing configset
-curl -X GET -u solr:kpZHPwJWokqawv39ycHM --header 'Content-Type:text/xml' 'http://solr.kub.sspcloud.fr/api/cluster/configs?omitHeader=true'
+curl -X GET -u solr:pwd --header 'Content-Type:text/xml' 'http://solr.kub.sspcloud.fr/api/cluster/configs?omitHeader=true'
+
+# add user via rest api
+curl --user solr:SolrRocks http://localhost:8983/sorl/admin/authentication \
+  -H 'Content-type:application/json' \
+  -d '{"set-user":{"toto":"NewPassword"}}'
 ```
