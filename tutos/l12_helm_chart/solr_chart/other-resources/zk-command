@@ -4,7 +4,7 @@
 bin/zkCli.sh -server localhost:2181
 
 # set the path /security.json with the json file content
-set /security.json '{"authentication":{"class":"solr.BasicAuthPlugin","credentials":{"solr":"F2A0any174WhnvB6sU8iFbafRYCuozBIxCF/a2xP73g= iJuIbOaDjEdtsLh+C47CFlLzR5lklk3K5LM9MHpHIpA="}},"authorization":{"class":"solr.RuleBasedAuthorizationPlugin","user-role":{"solr":"admin"}, "permissions":[{"name":"all","role":"admin"}]}}'
+set /security.json '{"authentication":{"blockUnknown": false,"class":"solr.BasicAuthPlugin","credentials":{"solr":"F2A0any174WhnvB6sU8iFbafRYCuozBIxCF/a2xP73g= iJuIbOaDjEdtsLh+C47CFlLzR5lklk3K5LM9MHpHIpA="}},"authorization":{"class":"solr.RuleBasedAuthorizationPlugin","user-role":{"solr":"admin"}, "permissions":[{"name":"all","role":"admin"}]}}'
 
 # copy a local file to zk server
 bin/zkCli.sh -server localhost:2181 -cmd put /security.json \
