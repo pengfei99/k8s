@@ -1,0 +1,8 @@
+apiVersion: v2
+name: kafka
+version: 1.0.0
+dependencies:
+  - name: kafka
+    version: 12.6.2
+    repository: https://charts.bitnami.com/bitnami
+    enabled: true

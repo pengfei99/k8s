@@ -19,23 +19,6 @@ spec:
         app: atlas
         release: atlas-test
     spec:
-      initContainers:
-        - name: atlas-init
-          image: "manjitsing664/atlasimage:latest"
-          imagePullPolicy: IfNotPresent
-          command: [
-                    "/bin/bash",
-                    "-c",
-                    "apk update;
-                     apk add curl zip;
-                     zip config.zip /apache-atlas-2.1.0-SNAPSHOT/conf/solr/*;
-                     curl -X POST --header 'Content-Type:text/xml' -d @config.zip 'http://pengfei-solr-svc:8983/solr/admin/configs?action=CREATE&name=vertex_index';
-                     curl -X POST --header 'Content-Type:text/xml' -d @config.zip 'http://pengfei-solr-svc:8983/solr/admin/configs?action=CREATE&name=edge_index';
-                     curl -X POST --header 'Content-Type:text/xml' -d @config.zip 'http://pengfei-solr-svc:8983/solr/admin/configs?action=CREATE&name=fulltext_index';"
-                    ]
-          env:
-            - name: ZK_CLIENT_TIMEOUT
-              value: ""
       containers:
         - name: atlas
           command: [

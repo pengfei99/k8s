@@ -1,0 +1,90 @@
+kafka:
+  ############### image conf ######################
+  image:
+  registry: docker.io
+  repository: bitnami/kafka
+  tag: 2.7.0-debian-10-r1
+  pullPolicy: IfNotPresent
+  ## Set to true if you would like to see extra information on logs
+  debug: false
+
+  
+  ################## Kafka's Java Heap size
+  heapOpts: -Xmx2048m -Xms1024m
+
+  ################## Topic creation settings #################
+  ## Switch to enable topic deletion or not.
+  deleteTopicEnable: false
+
+  ## Switch to enable auto creation of topics.
+  ## Enabling auto creation of topics not recommended for production or similar environments.
+  ##
+  autoCreateTopicsEnable: true
+
+  ################# Settings for log message ############
+  ## The number of messages to accept before forcing a flush of data to disk.
+  logFlushIntervalMessages: 10000
+
+  ## The maximum amount of time a message can sit in a log before we force a flush.
+  logFlushIntervalMs: 1000
+
+  ## A size-based retention policy for logs.
+  logRetentionBytes: _1073741824
+
+  ## The interval at which log segments are checked to see if they can be deleted.
+  logRetentionCheckIntervalMs: 300000
+
+  ## The minimum age of a log file to be eligible for deletion due to age.
+  logRetentionHours: 168
+
+  ## The maximum size of a log segment file. When this size is reached a new log segment will be created.
+  logSegmentBytes: _1073741824
+
+  ## A comma separated list of directories under which to store log files.
+  logsDirs: /bitnami/kafka/data
+
+  ########################## settings for service and port ############
+  ## Service parameters
+  ##
+  service:
+    ## Service type
+    type: ClusterIP
+    ## Kafka port for client connections
+    port: 9092
+    ## Kafka port for inter-broker connections
+    internalPort: 9093
+    ## Kafka port for external connections
+    externalPort: 9094
+  
+  ###################### settings for persistence ###################
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    ## PVC size
+    size: 8Gi
+    ## Mount point for persistence
+    mountPath: /bitnami/kafka
+  ########################### settings for zookeeper ##################
+  zookeeper:
+    enabled: false
+    # auth:
+    ## Enable Zookeeper auth
+    # enabled: false
+    ## User that will use Zookeeper clients to auth
+    ##
+    # clientUser:
+    ## Password that will use Zookeeper clients to auth
+    ##
+    # clientPassword:
+    ## Comma, semicolon or whitespace separated list of user to be created. Specify them as a string, for example: "user1,user2,admin"
+    ##
+    # serverUsers:
+    ## Comma, semicolon or whitespace separated list of passwords to assign to users when created. Specify them as a string, for example: "pass4user1, pass4user2, pass4admin"
+    ##
+    # serverPasswords:
+
+  ## This value is only used when zookeeper.enabled is set to false
+  externalZookeeper:
+  ## Server or list of external zookeeper servers to use.
+    servers: [pengfei-solr-zookeeper-headless]
