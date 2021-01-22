@@ -34,11 +34,33 @@ spec:
           volumeMounts:
           - name: atlas-config
             mountPath: /opt/apache-atlas-2.1.0/conf/atlas-application.properties
-            subPath: atlas-application.properties       
-          - name: atlas-config
-            mountPath: /opt/apache-atlas-2.1.0/conf/atlas-env.sh    
-            subPath: atlas-env.sh 
+            subPath: atlas-application.properties
+          - name: atlas-data-volume
+            mountPath: /opt/apache-atlas-2.1.0/data       
+          env:
+            - name: MANAGE_LOCAL_HBASE
+              value: "true"
+            - name: MANAGE_LOCAL_SOLR
+              value: "true"
       volumes:
       - name: atlas-config
         configMap:
           name: atlas-config
+      - name: atlas-data-volume
+        persistentVolumeClaim:
+          claimName: atlas-data-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: atlas-data-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+# used to bind PV with the same class name, if you want the DefaultStorageClass create a PV dynamically, just put "".
+  storageClassName: rook-ceph-block
+      
