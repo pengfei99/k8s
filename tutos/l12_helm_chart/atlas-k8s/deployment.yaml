@@ -24,17 +24,20 @@ spec:
           command: [
                     "/bin/bash",
                     "-c",
-                    "/apache-atlas-2.1.0-SNAPSHOT/bin/atlas_start.py;
-                      tail -f /apache-atlas-2.1.0-SNAPSHOT/logs/*.log;"
+                    "/opt/apache-atlas-2.1.0/bin/atlas_start.py;
+                    "
                     ]
-          image: "manjitsing664/atlasimage:latest"
+          image: "sburn/apache-atlas"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 21000
           volumeMounts:
           - name: atlas-config
-            mountPath: /apache-atlas-2.1.0-SNAPSHOT/conf/atlas-application.properties
-            subPath: atlas-application.properties            
+            mountPath: /opt/apache-atlas-2.1.0/conf/atlas-application.properties
+            subPath: atlas-application.properties       
+          - name: atlas-config
+            mountPath: /opt/apache-atlas-2.1.0/conf/atlas-env.sh    
+            subPath: atlas-env.sh 
       volumes:
       - name: atlas-config
         configMap:
