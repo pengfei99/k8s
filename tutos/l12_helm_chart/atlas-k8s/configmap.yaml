@@ -65,7 +65,7 @@ data:
     # SSL config
     atlas.enableTLS=false
     atlas.authentication.method.kerberos=false
-    atlas.authentication.method.file=true
+    atlas.authentication.method.file=false
     #### ldap.type= LDAP or AD
     atlas.authentication.method.ldap.type=none
 
@@ -106,6 +106,12 @@ data:
     #########  UI Configuration ########
     atlas.ui.default.version=v1
     atlas.ui.editable.entity.types=*
+
+    ########################## keycloak auth configuration ###########################
+    atlas.authentication.method.keycloak=true
+    atlas.authentication.method.keycloak.file=/opt/apache-atlas-2.1.0/conf/keycloak.json
+    atlas.authentication.method.keycloak.ugi-groups=false
+
 
   atlas-env.sh: |
     #!/usr/bin/env bash
@@ -160,3 +166,15 @@ data:
 
     # indicates whether or not a local instance of Elasticsearch should be started for Atlas
     export MANAGE_LOCAL_ELASTICSEARCH=false
+
+  keycloak.json: |
+    {"realm": "sspcloud", 
+    "auth-server-url": "https://auth.lab.sspcloud.fr/auth", 
+    "ssl-required": "external",
+    "resource": "atlas",
+    "public-client": true, 
+    "confidential-port": 0, 
+    "principal-attribute": "preferred_username", 
+    "autodetect-bearer-only": true 
+    }
+
