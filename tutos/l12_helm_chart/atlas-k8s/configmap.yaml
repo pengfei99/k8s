@@ -109,36 +109,20 @@ data:
     # SSL config
     atlas.enableTLS=false
 
-    #truststore.file=/path/to/truststore.jks
-    #cert.stores.credential.provider.path=jceks://file/path/to/credentialstore.jceks
-
-    #following only required for 2-way SSL
-    #keystore.file=/path/to/keystore.jks
-
-    # Authentication config
-
+    ########################### Authentication config ##################
     atlas.authentication.method.kerberos=false
-    atlas.authentication.method.file=true
+    atlas.authentication.method.file=false
+    ## keycloak auth configuration 
+    atlas.authentication.method.keycloak=true
+    atlas.authentication.method.keycloak.file=/opt/apache-atlas-2.1.0/conf/keycloak.json
+    atlas.authentication.method.keycloak.ugi-groups=false
+
 
     #### ldap.type= LDAP or AD
     atlas.authentication.method.ldap.type=none
 
     #### user credentials file
     atlas.authentication.method.file.filename=${sys:atlas.home}/conf/users-credentials.properties
-
-    ### groups from UGI
-    #atlas.authentication.method.ldap.ugi-groups=true
-
-   
-    #########  JAAS Configuration ########
-
-    #atlas.jaas.KafkaClient.loginModuleName = com.sun.security.auth.module.Krb5LoginModule
-    #atlas.jaas.KafkaClient.loginModuleControlFlag = required
-    #atlas.jaas.KafkaClient.option.useKeyTab = true
-    #atlas.jaas.KafkaClient.option.storeKey = true
-    #atlas.jaas.KafkaClient.option.serviceName = kafka
-    #atlas.jaas.KafkaClient.option.keyTab = /etc/security/keytabs/atlas.service.keytab
-    #atlas.jaas.KafkaClient.option.principal = atlas/_HOST@EXAMPLE.COM
 
     #########  Server Properties  #########
     atlas.rest.address=http://localhost:21000
@@ -194,31 +178,6 @@ data:
     ############ Atlas Metric/Stats configs ################
     # Format: atlas.metric.query.<key>.<name>
     atlas.metric.query.cache.ttlInSecs=900
-    #atlas.metric.query.general.typeCount=
-    #atlas.metric.query.general.typeUnusedCount=
-    #atlas.metric.query.general.entityCount=
-    #atlas.metric.query.general.tagCount=
-    #atlas.metric.query.general.entityDeleted=
-    #
-    #atlas.metric.query.entity.typeEntities=
-    #atlas.metric.query.entity.entityTagged=
-    #
-    #atlas.metric.query.tags.entityTags=
-
-    #########  Compiled Query Cache Configuration  #########
-
-    # The size of the compiled query cache.  Older queries will be evicted from the cache
-    # when we reach the capacity.
-
-    #atlas.CompiledQueryCache.capacity=1000
-
-    # Allows notifications when items are evicted from the compiled query
-    # cache because it has become full.  A warning will be issued when
-    # the specified number of evictions have occurred.  If the eviction
-    # warning threshold <= 0, no eviction warnings will be issued.
-
-    #atlas.CompiledQueryCache.evictionWarningThrottle=0
-
 
     #########  Full Text Search Configuration  #########
 
@@ -288,3 +247,14 @@ data:
 
     # indicates whether or not a local instance of Elasticsearch should be started for Atlas
     export MANAGE_LOCAL_ELASTICSEARCH=false
+
+  keycloak.json: |
+    {"realm": "sspcloud", 
+    "auth-server-url": "https://auth.lab.sspcloud.fr/auth", 
+    "ssl-required": "external",
+    "resource": "atlas",
+    "public-client": true, 
+    "confidential-port": 0, 
+    "principal-attribute": "preferred_username", 
+    "autodetect-bearer-only": true 
+    }

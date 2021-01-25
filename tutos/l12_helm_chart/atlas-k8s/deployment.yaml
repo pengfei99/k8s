@@ -35,6 +35,9 @@ spec:
           - name: atlas-config
             mountPath: /opt/apache-atlas-2.1.0/conf/atlas-application.properties
             subPath: atlas-application.properties
+          - name: atlas-config
+            mountPath: /opt/apache-atlas-2.1.0/conf/keycloak.json
+            subPath: keycloak.json
           - name: atlas-data-volume
             mountPath: /opt/apache-atlas-2.1.0/data       
           env:
