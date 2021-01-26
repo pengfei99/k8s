@@ -6,13 +6,13 @@ data:
   atlas-application.properties: |
     #########  Graph Database Configs  #########
     atlas.graph.storage.backend=cql
-    atlas.graph.storage.hostname=pengfei-cassandra
+    atlas.graph.storage.hostname=pengfei-cassandra-headless
     atlas.graph.storage.cassandra.keyspace=JanusGraph
     atlas.graph.storage.clustername=cassandra
     atlas.graph.storage.port=9042
-    atlas.graph.storage.password=test
     atlas.graph.storage.username=cassandra
-
+    atlas.graph.storage.password=test
+    
     atlas.EntityAuditRepository.impl=org.apache.atlas.repository.audit.CassandraBasedAuditRepository
     atlas.EntityAuditRepository.keyspace=atlas_audit
     atlas.EntityAuditRepository.replicationFactor=1
@@ -166,15 +166,4 @@ data:
 
     # indicates whether or not a local instance of Elasticsearch should be started for Atlas
     export MANAGE_LOCAL_ELASTICSEARCH=false
-
-  keycloak.json: |
-    {"realm": "sspcloud", 
-    "auth-server-url": "https://auth.lab.sspcloud.fr/auth", 
-    "ssl-required": "external",
-    "resource": "atlas",
-    "public-client": true, 
-    "confidential-port": 0, 
-    "principal-attribute": "preferred_username", 
-    "autodetect-bearer-only": true 
-    }
 
