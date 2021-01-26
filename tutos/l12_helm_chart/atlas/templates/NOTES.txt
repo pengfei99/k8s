@@ -1,4 +1,5 @@
-1. Get the application URL by running these commands:
+1. Please be patient, the atlas server needs a few seconds to create index in solr server.
+2. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}
   {{- range .paths }}

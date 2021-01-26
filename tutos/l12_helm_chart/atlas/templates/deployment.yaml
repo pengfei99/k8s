@@ -35,7 +35,7 @@ spec:
                     ]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.name }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -70,7 +70,7 @@ spec:
       volumes:
         - name: atlas-config
           configMap:
-            name: atlas-config
+            name: {{ .Release.Name }}-atlas-cm
         - name: atlas-data-volume
           persistentVolumeClaim:
-            claimName: atlas-data-claim
+            claimName: {{ .Release.Name }}-atlas-data-claim

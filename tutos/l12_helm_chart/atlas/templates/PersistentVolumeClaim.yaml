@@ -4,7 +4,9 @@ metadata:
   name: {{ .Release.Name }}-atlas-data-claim
 spec:
   accessModes:
-    {{- toYaml .Values.pvc.accessModes | nindent 12 }}
+    {{- range .Values.pvc.accessModes }}
+    - {{ . }}
+    {{- end }}
   volumeMode: {{ .Values.pvc.volumeMode }}
   resources:
     requests:
