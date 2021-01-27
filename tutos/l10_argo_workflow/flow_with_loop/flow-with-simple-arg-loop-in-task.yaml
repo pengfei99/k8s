@@ -1,0 +1,34 @@
+# If a task or step has the loop argument. The task or step will be created repeatly for each item in the loop
+# In this example, we have three items, so three steps will be created. As each steps has its own pod. So
+# this flow will create 3 pods
+
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-simple-arg-loop-
+spec:
+  entrypoint: loop-example
+  templates:
+  - name: loop-example
+    dag:
+      tasks:
+      - name: print-message
+        template: print-worker
+        # in argument we can use withItems to put a list of arguments which the template will loop with
+        arguments:
+          parameters:
+          - name: message
+            value: "{{item}}"
+        withItems:              
+        - first item value         # item 1
+        - second item value        # item 2
+        - third item value         # item 3
+
+  - name: print-worker
+    inputs:
+      parameters:
+      - name: message
+    container:
+      image: busybox
+      command: ["echo"]
+      args: ["{{inputs.parameters.message}}"]

@@ -1,0 +1,35 @@
+# The loop argument can be simple value. It also can be a list of key value pairs.
+# To access each vaule of the list, we can use {{item.keyname}}
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-list-arg-loop-
+spec:
+  entrypoint: loop-example
+  templates:
+  - name: loop-example
+    steps:
+    - - name: print-message
+        template: print-worker
+        # in argument we can use withItems to put a list of arguments which the template will loop with
+        arguments:
+          parameters:
+          - name: login
+            value: "{{item.id}}"
+          - name: password 
+            value: "{{item.pwd}}"
+        withItems:              
+        - { id: 'step1', pwd: 'titi' }       #item set 1
+        - { id: 'step2', pwd: 'toto' }       #item set 2
+        - { id: 'step3', pwd: 'tata' }       #item set 3
+        - { id: 'step4', pwd: 'tutu' }     #item set 4
+
+  - name: print-worker
+    inputs:
+      parameters:
+      - name: login 
+      - name: password 
+    container:
+      image: busybox
+      command: ["echo"]
+      args: ["The is {{inputs.parameters.login}}, the password is {{inputs.parameters.password}}"]

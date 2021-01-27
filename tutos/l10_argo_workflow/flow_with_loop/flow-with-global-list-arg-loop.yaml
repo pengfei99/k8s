@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-global-list-arg-loop-
+spec:
+  entrypoint: loop-example
+  # declare global parameters, note that the value only takes a json compatible data.
+  # unlike the withItems takes a list of key value paires.
+  arguments:
+    parameters:
+    - name: user-list
+      value: |
+        [
+          { "id": "step1", "pwd": "titi" },  
+          { "id": "step2", "pwd": "toto" },      
+          { "id": "step3", "pwd": "tata" },    
+          { "id": "step4", "pwd": "tutu" } 
+        ]
+  templates:
+  - name: loop-example
+    # invoke the global parameter of the workflow as the input of the template 
+    inputs:
+      parameters:
+      - name: user-list
+    steps:
+    - - name: print-message
+        template: print-worker
+        arguments:
+          parameters:
+          - name: login
+            value: "{{item.id}}"
+          - name: password 
+            value: "{{item.pwd}}"
+        # pass the inputs to the step "withParam"
+        withParam: "{{inputs.parameters.user-list}}"            
+       
+
+  - name: print-worker
+    inputs:
+      parameters:
+      - name: login 
+      - name: password 
+    container:
+      image: busybox
+      command: ["echo"]
+      args: ["The is {{inputs.parameters.login}}, the password is {{inputs.parameters.password}}"]
