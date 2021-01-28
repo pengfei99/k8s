@@ -1,5 +1,3 @@
-# Output parameters provide a general mechanism to use the result of a step as a parameter rather than as an artifact. 
-# This allows you to use the result from any type of step, not just a script, for conditional tests, loops, and arguments
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
@@ -11,30 +9,27 @@ spec:
   - name: master-task
     dag:
       tasks:
-      # task 1-1 generate random number
+      # task 1-1 extract-data-from-db
       - name: extract-data-from-db
         template: python-extractor
-      # task 1-2 generate random number
+      # task 1-2 extract-data-from-s3
       - name: extract-data-from-s3
         template: python-extractor
-      # task 1-3 generate random number
+      # task 1-3 extract-data-from-web-scraptor
       - name: web-scraping
         template: python-extractor
 
-      # task 2 write the three generated random numbers to a file
+      # task 2 save data to data lake
       - name: save-data-to-datalake
         dependencies: [extract-data-from-db,extract-data-from-s3,web-scraping]
         template: output-param
         arguments:
           parameters: 
           - name: random-val-1
-          # the value is from task "generate-random-value-1", as the template of this task is a script. So the the output is in outputs.result
             value: "{{tasks.extract-data-from-db.outputs.result}}"
           - name: random-val-2
-          # the value is from task "generate-random-value-2", as the template of this task is a script. So the the output is in outputs.result
             value: "{{tasks.extract-data-from-s3.outputs.result}}"
           - name: random-val-3
-          # the value is from task "generate-random-value", as the template of this task is a script. So the the output is in outputs.result
             value: "{{tasks.web-scraping.outputs.result}}"
 
      # task 3 is a sub master which contains multiple steps
@@ -44,7 +39,6 @@ spec:
         arguments:
           parameters: 
           - name: all-val
-          # the value is from task "generate-random-value-1", as the template of this task is a script. So the the output is in outputs.result
             value: "{{tasks.save-data-to-datalake.outputs.parameters.random-val}}"
 
     # task 4 

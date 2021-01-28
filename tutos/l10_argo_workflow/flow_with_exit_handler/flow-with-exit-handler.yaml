@@ -1,0 +1,77 @@
+# An exit handler is a template that always executes at the end of the workflow, irrespective of success or failure of the workflow.
+# Some common use cases of exit handlers are:
+# - cleaning up after a workflow runs
+# - sending notifications of workflow status (e.g., e-mail/Slack)
+# - posting the pass/fail status to a webhook result (e.g. GitHub build result)
+# - resubmitting or submitting another workflow
+
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-exit-handlers-
+spec:
+  entrypoint: main
+  onExit: exit-handler                  # invoke exit-handler template at end of the workflow
+  templates:
+  # primary workflow template
+  - name: main 
+    dag:
+      tasks:
+      - name: gen-number
+        template: generate-number
+      - name: fail-succeeded
+        dependencies: [gen-number]
+        template: intentional-fail
+        arguments:
+          parameters:
+          - name: code 
+            value: "{{tasks.gen-number.outputs.result}}"
+
+  - name: intentional-fail
+    inputs:
+      parameters:
+      - name: code
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo intentional failure; exit {{inputs.parameters.code}}"]
+
+  # Exit handler templates
+  # After the completion of the entrypoint template, the status of the
+  # workflow is made available in the global variable {{workflow.status}}.
+  # {{workflow.status}} will be one of: Succeeded, Failed, Error
+  - name: exit-handler
+    steps:
+    - - name: notify
+        template: send-email
+      - name: celebrate
+        template: celebrate
+        when: "{{workflow.status}} == Succeeded"
+      - name: cry
+        template: cry
+        when: "{{workflow.status}} != Succeeded"
+  # Return a random number between 0 and 1
+  - name: generate-number
+    script:
+      image: python:alpine3.6
+      command: [python]
+      source: |
+        import random
+        code = random.randint(0,1)
+        print(code)
+      
+  - name: send-email
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo send e-mail: {{workflow.name}} {{workflow.status}}"]
+  - name: celebrate
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo Great!"]
+  - name: cry
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo shit!"]
