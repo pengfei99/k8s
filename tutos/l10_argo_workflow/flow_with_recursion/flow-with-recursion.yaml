@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-recursion-
+spec:
+  entrypoint: main
+  templates:
+  - name: main
+    steps:
+    # generate a random number
+    - - name: generate-condition
+        template: gen-condition
+    # evaluate the result in parallel
+    # call heads template if "heads" condition is satisfaited
+    - - name: heads
+        template: heads                 
+        when: "{{steps.generate-condition.outputs.result}} == heads"
+      # call main task if "tails" condition is satisfaited
+      - name: tails                     
+        template: main
+        when: "{{steps.generate-condition.outputs.result}} == tails"
+
+  - name: gen-condition
+    script:
+      image: python:alpine3.6
+      command: [python]
+      source: |
+        import random
+        result = "heads" if random.randint(0,1) == 0 else "tails"
+        print(result)
+
+  - name: heads
+    container:
+      image: alpine:3.6
+      command: [sh, -c]
+      args: ["echo \"it was heads\""]

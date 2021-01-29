@@ -1,0 +1,34 @@
+# In a workflow, we can use retryStrategy that will dictate how failed or errored steps are retried:
+# This example demonstrates the use of retry back offs
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-retry-
+spec:
+  entrypoint: simple-task
+  templates:
+  - name: simple-task
+    retryStrategy:
+    # limit is the maximum number of times the container will be retried
+      limit: 10
+    # retryPolicy has three possible values
+    # - "OnFailure" (default): means a container will be retried on failure 
+    # - "OnError": means a container will be retried on error
+    # - "Always": retries on both errors and failures 
+    # Providing an empty retryStrategy (i.e. retryStrategy: {}) will cause a container to retry until completion.
+      retryPolicy: "Always"
+    # backoff is an exponential backoff  
+      backoff:
+        duration: "1"      # Must be a string. Default unit is seconds. Could also be a Duration, e.g.: "2m", "6h", "1d"
+        factor: 2
+        maxDuration: "1m"  # Must be a string. Default unit is seconds. Could also be a Duration, e.g.: "2m", "6h", "1d"
+     # There is a bug in argo. we will have unknown field "affinity" if we enable affinity
+     # affinity:
+     # nodeAntiAffinity prevents running steps on the same host. Current implementation allows only empty nodeAntiAffinity (i.e. nodeAntiAffinity: {}) 
+     # and by default it uses label kubernetes.io/hostname as the selector.
+     #   nodeAntiAffinity: {}
+    container:
+      image: python:alpine3.6
+      command: ["python", -c]
+      # fail with a 66% probability
+      args: ["import random; import sys; exit_code = random.choice([0, 1, 1]); sys.exit(exit_code)"]

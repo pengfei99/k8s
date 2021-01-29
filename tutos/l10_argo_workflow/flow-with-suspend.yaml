@@ -1,0 +1,37 @@
+# Workflows can be suspended by "argo suspend <workflow-name>"
+# Or we can specify a suspend step on the workflow
+# Once suspended, a Workflow will not schedule any new steps until it is resumed. 
+# It can be resumed manually by "argo resume <workflow-name>"
+# In the following example, we give a duration of the suspention. So the workflow
+# will be resumed after this duration.
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: suspend-template-
+spec:
+  entrypoint: suspend
+  templates:
+  - name: suspend
+    steps:
+    - - name: build
+        template: whalesay
+    - - name: approve
+        template: approve
+    - - name: delay
+        template: delay
+    - - name: release
+        template: whalesay
+   # empty suspend will need manual activation to resume
+  - name: approve
+    suspend: {}
+
+  - name: delay
+    suspend:
+     # The duration must be a string. Default unit is seconds. Could also be a Duration, e.g.: "2m", "6h", "1d"
+      duration: "20"   
+
+  - name: whalesay
+    container:
+      image: docker/whalesay
+      command: [cowsay]
+      args: ["hello world"]

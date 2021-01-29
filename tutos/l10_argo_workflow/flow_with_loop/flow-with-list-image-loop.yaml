@@ -1,0 +1,35 @@
+# In this example, we could notice we use the input arguments in the image clause
+# not in the args clause. It means we can use the parameters in anywhere under 
+# container
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-with-list-image-loop-
+spec:
+  entrypoint: loop-map-example
+  templates:
+  - name: loop-map-example
+    steps:
+    - - name: test-linux
+        template: cat-os-release
+        arguments:
+          parameters:
+          - name: image
+            value: "{{item.image}}"
+          - name: tag
+            value: "{{item.tag}}"
+        withItems:
+        - { image: 'debian', tag: '9.1' }       #item set 1
+        - { image: 'centos', tag: '7' }       #item set 2
+        - { image: 'alpine', tag: '3.6' }       #item set 3
+        - { image: 'ubuntu', tag: '17.10' }     #item set 4
+
+  - name: cat-os-release
+    inputs:
+      parameters:
+      - name: image
+      - name: tag
+    container:
+      image: "{{inputs.parameters.image}}:{{inputs.parameters.tag}}"
+      command: [cat]
+      args: [/etc/os-release]
