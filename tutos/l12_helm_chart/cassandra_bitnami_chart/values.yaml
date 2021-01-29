@@ -43,7 +43,7 @@ cassandra:
   ######################## Database credentials ###############################
   dbUser:
     user: cassandra
-    forcePassword: true
+    forcePassword: false
     password: test
 
   ###################### cassandra Cluster parameters #######################
