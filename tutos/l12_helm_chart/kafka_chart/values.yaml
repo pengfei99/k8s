@@ -9,17 +9,42 @@ kafka:
   debug: false
 
   
-  ################## Kafka's Java Heap size
+  ################## Kafka's Java Heap size ############
   heapOpts: -Xmx2048m -Xms1024m
-
+  ################## Number of Kafka brokers to deploy #########
+  replicaCount: 3
   ################## Topic creation settings #################
   ## Switch to enable topic deletion or not.
   deleteTopicEnable: false
 
   ## Switch to enable auto creation of topics.
   ## Enabling auto creation of topics not recommended for production or similar environments.
-  ##
   autoCreateTopicsEnable: true
+
+  ## Default replication factors for automatically created topics
+  defaultReplicationFactor: 1
+
+  ## The replication factor for the offsets topic
+  offsetsTopicReplicationFactor: 1
+
+  ## The replication factor for the transaction topic
+  transactionStateLogReplicationFactor: 1
+
+  ## Overridden min.insync.replicas config for the transaction topic
+  transactionStateLogMinIsr: 1
+
+  ## The number of threads doing disk I/O.
+  numIoThreads: 8
+
+  ## The number of threads handling network requests.
+  numNetworkThreads: 3
+
+  ## The default number of log partitions per topic.
+  numPartitions: 1
+
+  ## The number of threads per data directory to be used for log recovery at startup and flushing at shutdown.
+  numRecoveryThreadsPerDataDir: 1
+
 
   ################# Settings for log message ############
   ## The number of messages to accept before forcing a flush of data to disk.

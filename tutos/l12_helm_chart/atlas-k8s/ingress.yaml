@@ -5,9 +5,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - atlas.lab.sspcloud.fr
+        - atlas-test.lab.sspcloud.fr
   rules:
-    - host: atlas.lab.sspcloud.fr
+    - host: atlas-test.lab.sspcloud.fr
       http:
         paths:
           - path: /
