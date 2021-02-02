@@ -35,9 +35,9 @@ spec:
       - name: s3-source
         path: /s3
         s3:
-          endpoint: https://minio.lab.sspcloud.fr
+          endpoint: minio.lab.sspcloud.fr
           bucket: argo-artifacts
-          key: /
+          key: titi
           accessKeySecret:
             name: prod-minio-cred
             key: accessKey
