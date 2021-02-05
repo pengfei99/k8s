@@ -10,7 +10,7 @@ data:
   default-v1: |
     s3:
       bucket: argo-artifacts
-      endpoint: https://minio.lab.sspcloud.fr
+      endpoint: minio.lab.sspcloud.fr
       accessKeySecret:
         name: prod-minio-cred
         key: accessKey
