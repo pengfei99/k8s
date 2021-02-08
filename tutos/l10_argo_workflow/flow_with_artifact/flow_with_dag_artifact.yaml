@@ -23,7 +23,7 @@ spec:
   - name: artifact1
     container:
       image: busybox
-      command: ["cat","hello world", ">>", "/mnt/out/hello_world.txt" ]
+      command: ["touch /mnt/out/hello_world.txt", "cat","hello world", ">", "/mnt/out/hello_world.txt" ]
       # While by default, the Docker and PNS workflow executors can get output artifacts from the base layer (e.g. /tmp), 
       # neither the Kubelet or the K8SAPI executors can. 
       # So if you do as the argo workflow official artifact example which output artifacts directly to /tmp, you will get an error. 
@@ -50,7 +50,7 @@ spec:
           # should be incorporated into the key name so the resulting file
           # has an accurate file extension.
           key: hello-art.tgz
-          accesssKeySecret:
+          accessKeySecret:
             name: prod-minio-cred
             key: accessKey
           secretKeySecret:
