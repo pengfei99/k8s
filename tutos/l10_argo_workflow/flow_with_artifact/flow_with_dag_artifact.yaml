@@ -51,10 +51,10 @@ spec:
           # has an accurate file extension.
           key: hello-art.tgz
           accesssKeySecret:
-            name: pengfei-private-minio-secret
+            name: prod-minio-cred
             key: accessKey
           secretKeySecret:
-            name: pengfei-private-minio-secret
+            name: prod-minio-cred
             key: secretKey
 
   - name: print-message
