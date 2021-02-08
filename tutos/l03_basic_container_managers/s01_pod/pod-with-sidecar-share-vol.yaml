@@ -1,3 +1,21 @@
+# This pod runs two containers which share the same volume. 
+# The app-container writes date to app.txt every 5 sec
+# The sidecare-container reads it and shows it via http
+# Note beware of your docker image version. If its too old
+# The manifest of the image may not be compatible with the new
+# docker runtime or k8s api. So you will see some weird CrashLoopBackOff error 
+# without any specific error logs in k8s. Try always run the image in a docker
+# runtime before you deploy it on k8s.
+# Once the pod is running:
+#   
+#   (Connect to the sidecar pod)
+#   kubectl exec pod-with-sidecar -c sidecar-container -it bash
+#   
+#   (Install curl on the sidecar)
+#   apt-get update && apt-get install curl
+#   
+#   (Access the log file via the sidecar)
+#   curl 'http://localhost:80/app.txt'
 apiVersion: v1
 kind: Pod
 metadata:
@@ -32,7 +50,7 @@ spec:
     # Simple sidecar: display log files using nginx.
     # In reality, this sidecar would be a custom image
     # that uploads logs to a third-party or storage service.
-    image: nginx:1.7.9
+    image: nginx:1.19.6
     ports:
       - containerPort: 80
 
