@@ -9,8 +9,9 @@ metadata:
 data:
   default-v1: |
     s3:
-      bucket: argo-artifacts
       endpoint: minio.lab.sspcloud.fr
+      bucket: argo-artifacts
+      key: titi
       accessKeySecret:
         name: prod-minio-cred
         key: accessKey
