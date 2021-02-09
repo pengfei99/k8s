@@ -5,8 +5,16 @@ metadata:
   labels:
     app: pengfei-cronjob
 spec:
-  # schedule defines how the job repeats, it uses the same syntax as the crontab, first arg is second, 2nd arg is minutes, 3: hour, 4: day 5: month
-  # */1 means every second. If you want every second starts after 6 second, you write 6/1. 8/2 means every 2 second starts after 8 second
+  # schedule defines how the job repeats, it uses the same syntax as the linux crontab syntax, 
+  # the five star is in order of [Minute] [Hour] [Day_of_the_Month] [Month_of_the_Year] [Day_of_the_Week],
+  # Note in the new linux release, you can add an optional six star to fefine year.
+  # 1: */2 means every two mins. If you want every min after 6 min, you write 6/1. 8/2 means every 2 min after 8 min
+  # As a result, the two numbers must in range of [0,59]
+  # 2: For hours, the two numbers must in range of [0,23]
+  # 3: For day of the month, the two numbers must in range of [1,31] 
+  # 4: For month of year, the two numbers must in range of [1,12]
+  # For day of the week, the two number must in range of [0,7], where 0 and 7 means Sunday
+  # "* * * * *" means the job will be running every min, every hour, every day,  
   schedule: "*/1 * * * *"
   # job template specify the job 
 
@@ -23,7 +31,7 @@ spec:
   concurrencyPolicy: Forbid
 
   # You can suspend a job by setting suspend = true. default value is false
-  suspend: true 
+  suspend: false
 
   # set the controller to save the number of succeed jobs, default value is 3
   successfulJobsHistoryLimit: 10
