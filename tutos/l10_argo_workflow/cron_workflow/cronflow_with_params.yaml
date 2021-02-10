@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: cronflow-with-params
+spec:
+  # cron scheduler manifest
+  schedule: "* * * * *"
+  concurrencyPolicy: "Allow"
+  startingDeadlineSeconds: 0
+  # the number of successful job which will be saved, default value is 3.
+  successfulJobsHistoryLimit: 4
+  # set the controller to save the number of failed jobs, default valie is 1
+  failedJobsHistoryLimit: 2
+  # workflow manifest
+  workflowMetadata:
+    labels:
+      pengfei: true
+  workflowSpec:
+    entrypoint: main
+    arguments:
+      parameters:
+        - name: message
+          value: "hello world"
+    templates:
+      - name: main
+        inputs:
+          parameters:
+            - name: message
+        container:
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: ["sh", -c]
+          args: ["echo {{inputs.parameters.message}}"]
