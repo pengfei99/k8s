@@ -4,7 +4,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  name: flow-with-step-use-print-message-template
+  name: flow-with-dag-use-print-message-template
 spec:
   entrypoint: whalesay
   templates:

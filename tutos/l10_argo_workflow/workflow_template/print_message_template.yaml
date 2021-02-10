@@ -5,7 +5,7 @@ kind: WorkflowTemplate
 metadata:
   name: print-message-template
 spec:
-  # This entrypoint is the default entrypoint. If the workflow which calls the template also provides an
+  # The entrypoint in the template is the default entrypoint. If the workflow which calls the template also provides an
   # entrypoint, the default one will be replaced
   entrypoint: main
   # This template has an exit handler
