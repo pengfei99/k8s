@@ -24,7 +24,21 @@ spec:
   # It stands for the deadline in seconds for starting the job if it misses its scheduled time for any reason. After the deadline, 
   # the cron job does not start the job. Jobs that do not meet their deadline in this way count as failed jobs. 
   # If this field is not specified, the jobs have no deadline.
-  startingDeadlineSeconds: 0
+
+  # For example, if a CronWorkflow that runs every minute is last run at 12:05:00, and the controller crashes between 12:05:55 
+  # and 12:06:05, then the expected execution time of 12:06:00 would be missed. However, if startingDeadlineSeconds is set to a 
+  # value greater than 65 (the amount of time passing between the last scheduled run time of 12:05:00 and the current controller 
+  # restart time of 12:06:05), then a single instance of the CronWorkflow will be executed exactly at 12:06:05.
+  # Currently only a single instance will be executed as a result of setting startingDeadlineSeconds.
+  startingDeadlineSeconds: 120
+  # the number of successful job which will be saved, default value is 3.
+  successfulJobsHistoryLimit: 4
+  # set the controller to save the number of failed jobs, default valie is 1
+  failedJobsHistoryLimit: 2
+  # Default to local machine timezone
+  timezone: "America/Los_Angeles"   
+  # Suspend your workflow is set to false by default
+  suspend: false
   workflowSpec:
     entrypoint: whalesay
     templates:
@@ -33,3 +47,18 @@ spec:
         image: alpine:3.6
         command: [sh, -c]
         args: ["date; sleep 90"]
+
+# To run a cron workflow you need the following command. Note that the old argo client does not support this command, you need to download a recent one
+# $ argo cron create path/to/your/cron.yaml
+# 
+# To list all cron workflow 
+# $ argo cron list
+#
+# Get details of a cron workflow
+# argo cron get test-cron-wf
+# 
+# If you don't have argo client, you can also use kubectl
+# kubectl apply -f path/to/your/cron.yaml
+# 
+# To list all cron workflow 
+# kubectl get cwf

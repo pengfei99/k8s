@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: print-message-template
+spec:
+  entrypoint: main
+  # This template has an exit handler
+  onExit: exit-handler
+  arguments:
+    parameters:
+      - name: message
+        value: hello world
+  templates:
+    - name: main
+      inputs:
+        parameters:
+          - name: message
+      container:
+        image: busybox
+        args: ["echo", "{{inputs.parameters.message}}"]
+        imagePullPolicy: IfNotPresent
+   # exit handler template
+    - name: exit-handler
+      container:
+        image: busybox
+        args: ["echo", "Exit Handler"]
+        imagePullPolicy: IfNotPresent
