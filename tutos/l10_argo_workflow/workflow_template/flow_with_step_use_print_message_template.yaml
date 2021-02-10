@@ -1,0 +1,23 @@
+# To reference a WorkflowTemplates in a workflow, you can use the templateRef field instead of template (which reference 
+# other templates within the same Workflow)
+# Note you should only reference external "templates" in a "steps" or "dag" "template"
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: flow-with-step-use-print-message-template
+spec:
+  entrypoint: whalesay
+  templates:
+  - name: whalesay
+    steps:
+      - - name: invoke-print-message-template
+          templateRef:
+            # This is the name of the "WorkflowTemplate" CRD that contains the "template" you want
+            name: print-message-template
+            # This is the name of the "template" in the "WorkflowTemplate" you want to reference
+            template: main
+          # You can pass in arguments as normal
+          arguments:
+            parameters:
+            - name: message
+              value: "hello world"

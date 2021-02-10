@@ -1,3 +1,5 @@
+# The workflow template definition in argo v2.7 and after are fully compatible with Workflow definitions. 
+# You only need to change kind: Workflow to kind: WorkflowTemplate to convert existing Workflow to a WorkflowTemplate.
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
@@ -25,3 +27,6 @@ spec:
         image: busybox
         args: ["echo", "Exit Handler"]
         imagePullPolicy: IfNotPresent
+
+# To submit a workflow template
+# argo template create path/to/template.yaml
