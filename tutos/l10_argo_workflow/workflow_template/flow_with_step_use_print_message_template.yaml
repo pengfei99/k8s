@@ -6,9 +6,9 @@ kind: Workflow
 metadata:
   name: flow-with-step-use-print-message-template
 spec:
-  entrypoint: whalesay
+  entrypoint: print
   templates:
-  - name: whalesay
+  - name: print
     steps:
       - - name: invoke-print-message-template
           templateRef:

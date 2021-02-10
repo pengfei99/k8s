@@ -6,9 +6,9 @@ kind: Workflow
 metadata:
   name: flow-with-dag-use-print-message-template
 spec:
-  entrypoint: whalesay
+  entrypoint: print
   templates:
-  - name: whalesay
+  - name: print
     dag:
       tasks:
       - name: invoke-print-message-template
