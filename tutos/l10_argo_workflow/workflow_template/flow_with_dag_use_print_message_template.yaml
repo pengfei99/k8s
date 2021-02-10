@@ -13,10 +13,10 @@ spec:
       tasks:
       - name: invoke-print-message-template
         templateRef:
-        # This is the name of the "WorkflowTemplate" CRD that contains the "template" you want
-        name: print-message-template
-        # This is the name of the "template" in the "WorkflowTemplate" you want to reference
-        template: main
+          # This is the name of the "WorkflowTemplate" CRD that contains the "template" you want
+          name: print-message-template
+          # This is the name of the "template" in the "WorkflowTemplate" you want to reference
+          template: main
         # You can pass in arguments as normal
         arguments:
           parameters:

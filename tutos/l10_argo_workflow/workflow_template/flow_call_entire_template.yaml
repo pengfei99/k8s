@@ -3,6 +3,7 @@ kind: Workflow
 metadata:
   generateName: flow-call-entire-template-
 spec:
+  # Specify an entry point 
   entrypoint: main
   arguments:
     parameters:
