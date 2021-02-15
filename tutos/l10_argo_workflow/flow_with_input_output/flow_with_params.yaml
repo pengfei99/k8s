@@ -6,27 +6,33 @@ metadata:
   generateName: hello-world-parameters-
 spec:
   # invoke the woker1 template with
-  # "hello ..." as the argument
+  # global-message as the argument
   # to the message parameter
   entrypoint: worker1
   arguments:
     parameters:
-    - name: message
+    - name: global-message
       value: value of workflow parameter
 
   templates:
   - name: worker1
-  # before you can use the parameter, you need to declare it in the template
-  # If you don't give a value here it will use the workflow parameter value
-  # If you give a value, this will be overwriten by the template parameter 
+  # you can also define parameter inside a template, it starts with keyword "inputs"
     inputs:
       parameters:
-      - name: message       # parameter declaration
+      - name: local-message       # parameter declaration
         value: value of template parameter
     container:
       image: busybox
       # run echo command with that message input parameter as args
       command: ["echo"]
       # invoke the parameter defined in argument section in container
-      args: ["{{inputs.parameters.message}}"]
-        
+      args: ["{{inputs.parameters.local-message}}, {{workflow.parameters.global-message}} "]
+
+# Try to change both the global-message and local-message to message. You can notice the template locale parameter will be 
+# overwriten by the workflow global parameter's value.  
+
+# As a result, do not mix the name of workflow parameter and template parameter 
+
+############## Enter params with argo submit #####################
+# You can also pass parameters with the command line client
+# argo submit flow_with_params.yaml -p 'global-message="value from cli"' --watch

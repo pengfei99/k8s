@@ -37,7 +37,7 @@ spec:
         s3:
           endpoint: minio.lab.sspcloud.fr
           bucket: argo-artifacts
-          key: titi
+          key: tmp
           accessKeySecret:
             name: prod-minio-cred
             key: accessKey

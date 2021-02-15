@@ -25,21 +25,21 @@ spec:
           #   AWS: s3.amazonaws.com
           #   GCS: storage.googleapis.com
           #   Minio: my-minio-endpoint.default:9000
-          endpoint: s3.amazonaws.com
-          bucket: my-bucket
+          endpoint: minio.lab.sspcloud.fr
+          bucket: argo-artifacts
 
           # NOTE: by default, output artifacts are automatically tarred and gzipped before saving.
           # As a best practice, .tgz or .tar.gz should be suffixed into the key name so the
           # resulting object has an accurate file extension and mime-type. If archive is set to
           # 'none', then preserve the appropriate file extension for the key name
-          key: path/in/bucket/hello_world.txt.tgz
+          key: tmp/hello_world.txt.tgz
 
           # accessKeySecret and secretKeySecret are secret selectors. It references the k8s secret
           # named 'my-s3-credentials'. This secret is expected to have have the keys 'accessKey'
           # and 'secretKey', containing the base64 encoded credentials to the bucket.
           accessKeySecret:
-            name: my-s3-credentials
+            name: prod-minio-cred
             key: accessKey
           secretKeySecret:
-            name: my-s3-credentials
+            name: prod-minio-cred
             key: secretKey
