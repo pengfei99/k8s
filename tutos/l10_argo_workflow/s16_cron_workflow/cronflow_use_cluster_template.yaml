@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: daily-job
+spec:
+  # run daily at 2am
+  schedule: "0 2 * * *"
+  workflowSpec:
+    # as the default parameter for the template is today. so the cron job will always
+    # print the date of current day
+    workflowTemplateRef:
+      name: print-date-cluster-template

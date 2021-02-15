@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: print-date-cluster-template
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: date
+  templates:
+    - name: main
+      inputs:
+        parameters:
+          - name: date
+            value: "{{inputs.parameters.date}}"
+            # use "today" is a magic value to tell the script it needs to determine the day to run
+            default: today
+      script:
+        image: docker/whalesay:latest
+        command:
+          - sh
+        source: |
+          date="{{inputs.parameters.date}}"
+          if [ $date = today ]; then
+            date=$(date -d today +%Y-%m-%d)
+          fi
+          echo "run for $date"

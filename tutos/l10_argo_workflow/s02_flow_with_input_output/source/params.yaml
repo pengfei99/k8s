@@ -1,0 +1,2 @@
+# argo submit job.yaml --parameter-file params.yaml
+message: goodbye my love
