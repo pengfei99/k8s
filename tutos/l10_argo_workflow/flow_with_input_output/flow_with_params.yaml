@@ -36,3 +36,8 @@ spec:
 ############## Enter params with argo submit #####################
 # You can also pass parameters with the command line client
 # argo submit flow_with_params.yaml -p 'global-message="value from cli"' --watch
+# Note this only works for workflow param, not for template inputs
+# If you want to use it in template inputs, 
+# 1. declare a workflow argument
+# 2. declare a template input with the same name as the workflow as the argument
+# 3. pass the value to workflow argument.

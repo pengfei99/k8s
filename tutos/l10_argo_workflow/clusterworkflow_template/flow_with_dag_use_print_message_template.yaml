@@ -1,0 +1,24 @@
+# To reference a ClusterWorkflowTemplates in a workflow, you can use the templateRef field with "clusterScope: true"
+# Note you should only reference external "templates" in a "steps" or "dag" "template"
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: flow-with-dag-use-print-message-template
+spec:
+  entrypoint: print
+  templates:
+  - name: print
+    dag:
+      tasks:
+      - name: invoke-print-message-template
+        templateRef:
+          # This is the name of the "WorkflowTemplate" CRD that contains the "template" you want
+          name: print-message-cluster-template
+          # This is the name of the "template" in the "WorkflowTemplate" you want to reference
+          template: main
+          clusterScope: true
+        # You can pass in arguments as normal
+        arguments:
+          parameters:
+          - name: message
+            value: "hello world"

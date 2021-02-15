@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: flow-call-entire-template-
+spec:
+  # Specify an entry point which will override the default entrypoint of the WorkflowTemplate
+  entrypoint: backup
+  arguments:
+    parameters:
+      - name: message
+        value: "from workflow"
+  workflowTemplateRef:
+    name: print-message-template
+    clusterScope: true
