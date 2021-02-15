@@ -53,3 +53,18 @@ spec:
       image: docker/whalesay
       command: [cowsay]
       args: ["{{inputs.parameters.message}}"]
+
+# Allowed specs keywords in step
+# - arguments:	Arguments hold arguments to the template
+# - continueOn:	ContinueOn makes argo to proceed with the following step even if this step fails. Errors and Failed states can be specified
+# - name:	Name of the step
+# - onExit:	OnExit is a template reference which is invoked at the end of the template, irrespective of the success, failure, or error of the primary template.
+# - template:	Template is the name of the template to execute as the step
+# - templateRef: TemplateRef is the reference to the template resource to execute as the step.
+# - when:	When is an expression in which the step should conditionally execute
+# - withItems:	WithItems expands a step into multiple parallel steps from the items in the list
+# - withParam:	WithParam expands a step into multiple parallel steps from the value in the parameter, which is expected to be a JSON list.
+# - withSequence:	WithSequence expands a step into a numeric sequence
+
+# You can notice "container" keyword is not supported in step. So we can't directly write specs of the container in a step. 
+# It must be done by invoking another template

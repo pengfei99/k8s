@@ -8,31 +8,25 @@ spec:
   # invoke the woker1 template with
   # "hello ..." as the argument
   # to the message parameter
-  entrypoint: main
+  entrypoint: worker1
   arguments:
     parameters:
     - name: message
-      value: workflow parameter
+      value: value of workflow parameter
 
   templates:
-  - name: main
-    dag:
-      tasks:
-      - name: worker1
-      # before you can use the parameter, you need to declare it in the template
-        inputs:
-          parameters:
-          - name: message       # parameter declaration
-            value: template parameter
-        container:
-          image: busybox
-          # run echo command with that message input parameter as args
-          command: ["echo"]
-          # invoke the parameter defined in argument section in container
-          args: ["{{inputs.parameters.message}}"]
-      - name: worker2
-        container:
-          image: busybox
-          command: ["echo"]
-          args: ["{{workflow.parameters.message}}"]
+  - name: worker1
+  # before you can use the parameter, you need to declare it in the template
+  # If you don't give a value here it will use the workflow parameter value
+  # If you give a value, this will be overwriten by the template parameter 
+    inputs:
+      parameters:
+      - name: message       # parameter declaration
+        value: value of template parameter
+    container:
+      image: busybox
+      # run echo command with that message input parameter as args
+      command: ["echo"]
+      # invoke the parameter defined in argument section in container
+      args: ["{{inputs.parameters.message}}"]
         
