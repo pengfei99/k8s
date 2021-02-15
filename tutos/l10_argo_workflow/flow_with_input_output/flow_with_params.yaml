@@ -1,0 +1,38 @@
+# To declare input in a workflow, we use keyword "arguments", which are passed in to the entry point template. 
+# A template uses keyword "inputs" which are then provided by template callers (such as steps, dag, or even a workflow).
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: hello-world-parameters-
+spec:
+  # invoke the woker1 template with
+  # "hello ..." as the argument
+  # to the message parameter
+  entrypoint: main
+  arguments:
+    parameters:
+    - name: message
+      value: workflow parameter
+
+  templates:
+  - name: main
+    dag:
+      tasks:
+      - name: worker1
+      # before you can use the parameter, you need to declare it in the template
+        inputs:
+          parameters:
+          - name: message       # parameter declaration
+            value: template parameter
+        container:
+          image: busybox
+          # run echo command with that message input parameter as args
+          command: ["echo"]
+          # invoke the parameter defined in argument section in container
+          args: ["{{inputs.parameters.message}}"]
+      - name: worker2
+        container:
+          image: busybox
+          command: ["echo"]
+          args: ["{{workflow.parameters.message}}"]
+        

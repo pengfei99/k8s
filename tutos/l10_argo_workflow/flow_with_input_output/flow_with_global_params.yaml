@@ -4,7 +4,7 @@ metadata:
   generateName: flow-with-global-parameters-
 spec:
   entrypoint: worker1
-  # the parameter here is a global variable, every template can use it
+  # the parameter here is a global variable, every template in this workflow can use it
   arguments:
     parameters:
     - name: log-level
