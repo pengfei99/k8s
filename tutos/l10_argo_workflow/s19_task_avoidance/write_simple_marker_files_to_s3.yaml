@@ -30,7 +30,8 @@ spec:
             s3:
               endpoint: minio.lab.sspcloud.fr
               bucket: argo-artifacts
-              key: {{workflow.parameters.argo-path}}
+              # we need to add "" to ask argo evaluate the template expression
+              key: "{{workflow.parameters.argo-path}}/{{workflow.parameters.marker-file-name}}.tgz"
               accessKeySecret:
                 name: prod-minio-cred
                 key: accessKey
