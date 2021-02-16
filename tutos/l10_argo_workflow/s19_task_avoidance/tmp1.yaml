@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: output-artifact-s3-
+spec:
+  entrypoint: main
+  templates:
+    - name: main
+      container:
+        image: busybox
+        command: [sh, -c]
+        args: ["touch /tmp/2021-02-16-echo-0"]
+        volumeMounts:
+          - name: out
+            mountPath: /tmp
+      # create an empty volume to output the artifacts
+      volumes:
+        - name: out
+          emptyDir: { }
+      outputs:
+        artifacts:
+          - name: message
+            path: /tmp
+            s3:
+              endpoint: minio.lab.sspcloud.fr
+              bucket: argo-artifacts
+              key: tmp
+              accessKeySecret:
+                name: prod-minio-cred
+                key: accessKey
+              secretKeySecret:
+                name: prod-minio-cred
+                key: secretKey

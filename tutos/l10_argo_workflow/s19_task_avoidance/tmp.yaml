@@ -51,10 +51,10 @@ spec:
               endpoint: minio.lab.sspcloud.fr
               accessKeySecret:
                 name: prod-minio-cred
-                key: accesskey
+                key: accessKey
               secretKeySecret:
                 name: prod-minio-cred
-                key: secretkey
+                key: secretKey
       container:
         image: docker/whalesay:latest
         command:
@@ -109,7 +109,7 @@ spec:
               endpoint: minio.lab.sspcloud.fr
               accessKeySecret:
                 name: prod-minio-cred
-                key: accesskey
+                key: accessKey
               secretKeySecret:
                 name: prod-minio-cred
-                key: secretkey
+                key: secretKey
