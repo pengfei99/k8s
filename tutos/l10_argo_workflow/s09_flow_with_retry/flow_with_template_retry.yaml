@@ -3,7 +3,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: flow-with-retry-
+  generateName: flow-with-template-retry-
 spec:
   entrypoint: simple-task
   templates:
@@ -24,7 +24,8 @@ spec:
         maxDuration: "1m"  # Must be a string. Default unit is seconds. Could also be a Duration, e.g.: "2m", "6h", "1d"
      # There is a bug in argo. we will have unknown field "affinity" if we enable affinity
      # affinity:
-     # nodeAntiAffinity prevents running steps on the same host. Current implementation allows only empty nodeAntiAffinity (i.e. nodeAntiAffinity: {}) 
+     # nodeAntiAffinity prevents running steps on the same host. Current implementation allows only empty
+     # nodeAntiAffinity (i.e. nodeAntiAffinity: {})
      # and by default it uses label kubernetes.io/hostname as the selector.
      #   nodeAntiAffinity: {}
     container:

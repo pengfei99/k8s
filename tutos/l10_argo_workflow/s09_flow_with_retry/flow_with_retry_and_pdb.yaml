@@ -1,0 +1,25 @@
+# To tolerate pod deletion during a node drain, we can set a podDisruptionBudget
+#  with a minAvailable. For example minAvailable: "9999" means pod eviction is allowed as long as there
+# are 9999 healthy pod left for the workflow. Normally this number should be slightly greater than the pod
+# number created by the workflow. Give an arbitrary big number if you don't know how many pods workflow creates
+
+# In the
+# The re
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: example
+spec:
+  podDisruptionBudget:
+    minAvailable: "10"
+  retryStrategy:
+    retryPolicy: OnError
+    limit: 10
+  entrypoint: main
+  templates:
+    - name: main
+      container:
+        image: python:alpine3.6
+        command: ["python", -c]
+        # fail with a 75% probability
+        args: ["import random; import sys; exit_code = random.choice([0, 1, 1, 1]); sys.exit(exit_code)"]
