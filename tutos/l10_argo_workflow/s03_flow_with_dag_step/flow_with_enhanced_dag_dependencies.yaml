@@ -2,15 +2,17 @@
 # But it does not allow the user to specify which result of the task to depend on. For example, a task may only be
 # relevant to run if the dependent task succeeded (or failed, etc.).
 #
-# Now we can use keyword "depends", which allows users to specify dependent tasks, their statuses, as well as any
-# complex boolean logic. The field is a string field and the syntax is expression-like with operands having form
-# <task-name>.<task-result>. Examples include task-1.Suceeded, task-2.Failed, task-3.Damenoed. The full list of
-# available task results is as follows:
+# Now we can use keyword "depends", which allows users to specify not only dependent tasks, but also their statuses,
+# as well as any complex boolean logic (&&,||,!). The field is a string field and the syntax is expression-like with
+#  operands having form <task-name>.<task-status>. The full list of available task status is as follows:
 # -.Succeeded :	Task Succeeded
 # -.Failed : Task Failed
 # -.Errored : Task Errored
 # -.Skipped : Task Skipped
-# -.Daemoned : Task is Daemoned and is not Pending
+# -.Daemoned : Task is Daemoned and is not Pending, this only works for the template with "daemon: true"
+
+# For example (!task-1.Suceeded && task-2.Failed) || task-3.Damenoed.
+
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
@@ -21,11 +23,20 @@ spec:
   - name: worker
     inputs:
       parameters:
-      - name: message
       - name: id
     container:
       image: busybox
-      command: [echo, "This is {{inputs.parameters.id}}, the message is {{inputs.parameters.message}}"]
+      command:
+        - bash
+        - -eux
+        source: |
+          echo "This is worker-{{inputs.parameters.id}}"
+          # toss a virtual coin and exit 1 if 1
+          if [ $(($(($RANDOM%10))%2)) -eq 1 ]; then
+            echo "job failed!"
+            exit 1
+          fi
+          echo "job succeded!"
    # The master template defines the tasks and their relationships.    
   - name: main
     dag:
@@ -36,45 +47,33 @@ spec:
         template: worker
       # the parameters which will be used on the template  
         arguments:
-          parameters: 
-          - name: message
-            value: A
+          parameters:
           - name: id
             value: task_A
       - name: task-preB
         template: worker
         arguments:
-          parameters: [{name: message, value: preB},{name: id,value: task_preB}]
+          parameters: [{name: id,value: task_preB}]
+      # task B runs if task A is finished correctly (succeeded,skipped,daemoned) or task-preB succeeded
       - name: task-B
-      # dependencies means the current task will start only if the dependent task finished correctly. 
-        dependencies: [task-A,task-preB]
+        # task-A without status means the current task will start only if the dependent task finished correctly.
+        # so, task-A is equivalent to (task-A.Succeeded || task-A.Skipped || task-A.Daemoned)
+        depends: "task-A || task-preB.Succeeded"
         template: worker
         arguments:
-          parameters: [{name: message, value: B},{name: id,value: task_B}]
+          parameters: [{name: id,value: task_B}]
+      # task C runs if task B succeeded
       - name: task-C
-        dependencies: [task-A]
+        depends: task-B.Succeeded
         template: worker
         arguments:
-          parameters: [{name: message, value: C},{name: id,value: task_C}]
+          parameters: [{name: id,value: task_C}]
+      # task D runs if task B failed
       - name: task-D
-        dependencies: [task-B, task-C]
+        depends: task-B.Failed
         template: worker
         arguments:
-          parameters: [{name: message, value: D},{name: id,value: task_D}]
+          parameters: [{name: id,value: task_D}]
 
-# Allowed specs keywords in dag tasks
-# - arguments:	Arguments hold arguments to the template
-# - continueOn:	ContinueOn makes argo to proceed with the following step even if this step fails. Errors and Failed states can be specified
-# - dependencies:	Dependencies are name of other targets which this depends on
-# - depends:	Depends are name of other targets which this depends on
-# - name:	Name of the step
-# - onExit:	OnExit is a template reference which is invoked at the end of the template, irrespective of the success, failure, or error of the primary template.
-# - template:	Template is the name of the template to execute as the step
-# - templateRef: TemplateRef is the reference to the template resource to execute as the step.
-# - when:	When is an expression in which the step should conditionally execute
-# - withItems:	WithItems expands a step into multiple parallel steps from the items in the list
-# - withParam:	WithParam expands a step into multiple parallel steps from the value in the parameter, which is expected to be a JSON list.
-# - withSequence:	WithSequence expands a step into a numeric sequence
-
-# You can notice "container" keyword is not supported in dag tasks. So we can't directly write specs of the container in a dag task. 
-# It must be done by invoking another template
+# The equivalence between depends and dependencies:
+# dependencies: ["A", "B", "C"]  is equivalent to depends: "A && B && C"
