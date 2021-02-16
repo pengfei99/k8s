@@ -1,16 +1,27 @@
 ##################### work avoidance. #######################################
 # A workflow that utilizes this is simply a workflow containing steps that do not run if the work has already
 # been done. This simplest way to do this is to use marker files.
+# Marker files are just empty files with the name of the specific task name to indicate that the task is done
+# and no need to re-run it again.
 # Use cases:
 # - An expensive step appears across multiple workflows - you want to avoid repeating them.
 # - A workflow has unreliable tasks - you want to be able resubmit the workflow.
-
+#
+# Note the marker file name must be unique for each task. The standard way is to use the template name, execution-date
+# and all the parameters of the template. If the task need to be renew every our, you can also change execution-date to
+# execution-hour. Or just omit it, if the task only need to run once. In our example, the template name is runner, so
+# we have the marker file as $(date +%Y-%m-%d)-runner-{{inputs.parameters.num}}
 
 # This example shows how to use a PVC and optional input artifacts to avoid work.
+# step 1: load-marker task read markers file from s3 artifact and write them to pvc
+# Step 2: Check first if the job is done or not(by checking if a marker file exists or not).
+#         if yes, skip job. if not, do the job(echo "working very hard"),and create file marker
+#         based on date and parameter
+# onExit step: write the marker files to s3
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: work-avoidance-
+  generateName: flow-with-work-avoidance-
 spec:
   entrypoint: main
 # Create a pvc for the workflow
@@ -30,8 +41,8 @@ spec:
       steps:
         - - name: load-markers
             template: load-markers
-        - - name: echo
-            template: echo
+        - - name: run-tasks
+            template: runner
             arguments:
               parameters:
                 - name: num
@@ -64,8 +75,10 @@ spec:
         volumeMounts:
           - name: work
             mountPath: /work
-# Step 2: create file marker based on date and parameter
-    - name: echo
+# Step 2: Check first if the job is done or not(by checking if a marker file exists or not).
+#         if yes, skip job. if not, do the job(echo "working very hard"),and create file marker
+#         based on date and parameter
+    - name: runner
       inputs:
         parameters:
           - name: num
@@ -75,15 +88,15 @@ spec:
           - bash
           - -eux
         source: |
-          marker=/work/markers/$(date +%Y-%m-%d)-echo-{{inputs.parameters.num}}
+          marker=/work/markers/$(date +%Y-%m-%d)-runner-{{inputs.parameters.num}}
           if [ -e  ${marker} ]; then
-            echo "work already done"
+            echo "job already done"
             exit 0
           fi
           echo "working very hard"
           # toss a virtual coin and exit 1 if 1
           if [ $(($(($RANDOM%10))%2)) -eq 1 ]; then
-            echo "oh no!"
+            echo "job failed!"
             exit 1
           fi
           touch ${marker}

@@ -1,15 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: output-artifact-s3-
+  generateName: write-simple-marker-files-to-s3-
 spec:
   entrypoint: main
+  arguments:
+    parameters:
+      - name: marker-file-name
+        value: 2021-02-16-echo-0
+      - name: argo-path
+        value: tmp
   templates:
     - name: main
       container:
         image: busybox
         command: [sh, -c]
-        args: ["touch /tmp/2021-02-16-echo-0"]
+        args: ["touch /tmp/{{workflow.parameters.marker-file-name}}"]
         volumeMounts:
           - name: out
             mountPath: /tmp
@@ -24,7 +30,7 @@ spec:
             s3:
               endpoint: minio.lab.sspcloud.fr
               bucket: argo-artifacts
-              key: tmp
+              key: {{workflow.parameters.argo-path}}
               accessKeySecret:
                 name: prod-minio-cred
                 key: accessKey
