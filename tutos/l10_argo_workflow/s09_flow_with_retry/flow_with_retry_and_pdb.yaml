@@ -3,15 +3,14 @@
 # are 9999 healthy pod left for the workflow. Normally this number should be slightly greater than the pod
 # number created by the workflow. Give an arbitrary big number if you don't know how many pods workflow creates
 
-# In the
-# The re
+# The retry can be at workflow(in this example), or at template level(in flow_with_template_retry.yaml).
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  name: example
+  generateName: flow-with-workflow-retry-and-pdb-
 spec:
   podDisruptionBudget:
-    minAvailable: "10"
+    minAvailable: 10
   retryStrategy:
     retryPolicy: OnError
     limit: 10
@@ -19,7 +18,12 @@ spec:
   templates:
     - name: main
       container:
-        image: python:alpine3.6
-        command: ["python", -c]
-        # fail with a 75% probability
-        args: ["import random; import sys; exit_code = random.choice([0, 1, 1, 1]); sys.exit(exit_code)"]
+        container:
+          image: docker/whalesay:latest
+          command:
+            - sleep
+            - 30s
+#        image: python:alpine3.6
+#        command: ["python", -c]
+#        # fail with a 75% probability
+#        args: ["import random; import sys; exit_code = random.choice([0, 1, 1, 1]); sys.exit(exit_code)"]
