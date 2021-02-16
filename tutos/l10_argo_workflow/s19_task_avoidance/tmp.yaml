@@ -46,7 +46,7 @@ spec:
             path: /work/markers
             optional: true
             s3:
-              key: work-avoidance-markers
+              key: work-avoidance-markers/markers.tgz
               bucket: argo-artifacts
               endpoint: minio.lab.sspcloud.fr
               accessKeySecret:
@@ -90,7 +90,7 @@ spec:
         volumeMounts:
           - name: work
             mountPath: /work
-# onExit step write the file marker to s3
+    # onExit step write the file marker to s3
     - name: save-markers
       container:
         image: docker/whalesay:latest
@@ -104,7 +104,14 @@ spec:
           - name: markers
             path: /work/markers
             s3:
-              key: work-avoidance-markers
+              # Note the key is very important, even marker is a directory in pvc, when we output it to s3
+              # it will be compressed into a tgz. And we must write down the complete path in key with the
+              # compressed filename of the directory
+              # In this example. all the content of /work/markers/... will be compressed into marker.tgz
+              # and output to s3://minio.lab.sspcloud.fr/argo-artifacts/work-avoidance-markers/markers.tgz
+              # If we only put work-avoidance-marker in key, we will have the following error.
+              # Failed to put file: Please reduce your request
+              key: work-avoidance-markers/markers.tgz
               bucket: argo-artifacts
               endpoint: minio.lab.sspcloud.fr
               accessKeySecret:
