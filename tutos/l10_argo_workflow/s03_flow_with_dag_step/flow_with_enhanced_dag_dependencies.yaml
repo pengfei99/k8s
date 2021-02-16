@@ -24,8 +24,8 @@ spec:
     inputs:
       parameters:
       - name: id
-    container:
-      image: busybox
+    script:
+      image: docker/whalesay:latest
       command:
         - bash
         - -eux
