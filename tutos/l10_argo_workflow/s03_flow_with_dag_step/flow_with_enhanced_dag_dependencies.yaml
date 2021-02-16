@@ -29,14 +29,14 @@ spec:
       command:
         - bash
         - -eux
-        source: |
-          echo "This is worker-{{inputs.parameters.id}}"
-          # toss a virtual coin and exit 1 if 1
-          if [ $(($(($RANDOM%10))%2)) -eq 1 ]; then
-            echo "job failed!"
-            exit 1
-          fi
-          echo "job succeded!"
+      source: |
+        echo "This is worker-{{inputs.parameters.id}}"
+        # toss a virtual coin and exit 1 if 1
+        if [ $(($(($RANDOM%10))%2)) -eq 1 ]; then
+          echo "job failed!"
+           exit 1
+        fi
+        echo "job succeded!"
    # The master template defines the tasks and their relationships.    
   - name: main
     dag:
