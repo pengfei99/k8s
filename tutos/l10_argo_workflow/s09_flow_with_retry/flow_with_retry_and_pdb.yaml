@@ -18,12 +18,9 @@ spec:
   templates:
     - name: main
       container:
-        container:
-          image: docker/whalesay:latest
-          command:
-            - sleep
-            - 30s
-#        image: python:alpine3.6
-#        command: ["python", -c]
-#        # fail with a 75% probability
-#        args: ["import random; import sys; exit_code = random.choice([0, 1, 1, 1]); sys.exit(exit_code)"]
+        image: docker/whalesay:latest
+        command:
+          - sleep
+          - 30s
+# After submit this work, then execute kubectl delete pod <pod-name-of-this-workflow>.
+# You'll see that the errored node is automatically retried.
