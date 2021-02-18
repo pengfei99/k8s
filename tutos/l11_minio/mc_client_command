@@ -7,8 +7,6 @@ mv mc /usr/local/bin
 # configure minio client to connect to a minio service. Here I define the name as minio, you can call it as you want. 
 # For example, mystorage 
 mc alias set minio https://minio.kub.sspcloud.fr/ <accesskey> <secretkey>
-mc alias set minio-prod https://minio.lab.sspcloud.fr/ argo-workflow 6GNxVqZLnpfnxcF0q7SW
-
 # check your minio service status, note this works only if your account have admin right
 mc admin info minio
 
@@ -18,11 +16,6 @@ mc admin user list minio
 
 # add a new user to minio
 mc admin user add minio
-
-# my private minio login info
-accesskey: NvwLGTpwV5pfwnAMtCGk
-secretkey: EPgyULnduwV9i5QOwnCNNOPK6tg8bis0mBkmfEjt
-bucketName: argo-repo
 
 # acl for argo to access minio
 allow {
