@@ -29,11 +29,11 @@ spec:
             storage: 10Gi
     - metadata:
         name: workflow-output
-        spec:
-          accessModes: [ "ReadWriteMany" ]
-          resources:
-            requests:
-              storage: 10Gi
+      spec:
+        accessModes: [ "ReadWriteMany" ]
+        resources:
+          requests:
+            storage: 10Gi
   templates:
     - name: main
       inputs:
@@ -65,4 +65,4 @@ spec:
           - name: workflow-code
             mountPath: /mnt/bin
           - name: workflow-input
-              mountPath: /mnt/input
+            mountPath: /mnt/input
