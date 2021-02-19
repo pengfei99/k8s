@@ -1,0 +1,18 @@
+scrapy
+beautifulsoup4
+numpy
+scipy
+pandas
+numpy
+scikit-learn
+keras
+# Pytorch is too large(778MB) to install. so we skip it for now
+# torch
+# tensorflow only support python 3.8. so if you build for python3.9. skip tensorflow
+tensorflow
+xgboost
+matplotlib
+seaborn
+bokeh
+plotly
+pydot
