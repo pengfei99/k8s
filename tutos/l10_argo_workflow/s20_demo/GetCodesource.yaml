@@ -63,8 +63,8 @@ spec:
           - name: workflow-tmp
             mountPath: /persistent/tmp
 
-    # worker template for task-1 check-duplicated-rows
-    - name: check-duplicated-rows-wt
+    # worker template for task-2 check-missing-values
+    - name: check-missing-value-wt
       inputs:
         artifacts:
           # Check out the master branch of the argo repo and place it at /src
@@ -93,4 +93,4 @@ spec:
                    /mnt/input/pokemon-bad.csv > /persistent/tmp/MissingValue.txt"]
         volumeMounts:
           - name: workflow-tmp
-          mountPath: /persistent/tmp
+            mountPath: /persistent/tmp
