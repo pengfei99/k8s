@@ -46,17 +46,17 @@ spec:
               repo: https://github.com/pengfei99/argoDataPipeline.git
               revision: "main"
           - name: input-data
-              path: /mnt/input
-              s3:
-                endpoint: minio.lab.sspcloud.fr
-                bucket: argo-artifacts
-                key: tmp
-                accessKeySecret:
-                  name: prod-minio-cred
-                  key: accessKey
-                secretKeySecret:
-                  name: prod-minio-cred
-                  key: secretKey
+            path: /mnt/input
+            s3:
+              endpoint: minio.lab.sspcloud.fr
+              bucket: argo-artifacts
+              key: tmp
+              accessKeySecret:
+                name: prod-minio-cred
+                key: accessKey
+              secretKeySecret:
+                name: prod-minio-cred
+                key: secretKey
       container:
         image: debian
         command: [sh, -c]
