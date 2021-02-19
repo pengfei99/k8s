@@ -63,6 +63,10 @@ spec:
         args: ["ls -l /mnt/bin /mnt/input"]
         volumeMounts:
           - name: workflow-code
-            mountPath: /mnt/bin
+            mountPath: /persistent/bin
           - name: workflow-input
-            mountPath: /mnt/input
+            mountPath: /persistent/input
+          - name: workflow-tmp
+            mountPath: /persistent/tmp
+          - name: workflow-output
+            mountPath: /persistent/output
