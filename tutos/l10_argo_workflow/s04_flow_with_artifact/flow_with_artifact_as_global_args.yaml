@@ -1,10 +1,4 @@
-# With Argo, you can use any container image that you like to generate any kind of artifact. 
-# In practice, however, we find certain types of artifacts are very common, so there is built-in 
-# support for :
-# - git
-# - http 
-# - gcs
-# - s3
+
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:

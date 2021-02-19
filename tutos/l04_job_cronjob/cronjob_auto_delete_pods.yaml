@@ -1,0 +1,58 @@
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: pods-manager
+  namespace: user-pengfei
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pods-manager
+  namespace: user-pengfei
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "patch", "list", "watch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pods-manager
+  namespace: user-pengfei
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pods-manager
+subjects:
+  - kind: ServiceAccount
+    name: pods-manager
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: deleting-pods-with-completed-status
+  namespace: user-pengfei
+spec:
+  concurrencyPolicy: Forbid
+  # Clean pods every hour.
+  schedule: "0 */1 * * *"
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          serviceAccountName: pods-manager
+          restartPolicy: Never
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl
+              command:
+                - 'kubectl'
+                - 'delete'
+                - 'pod'
+                - '-field-selector=status.phase==Succeeded'
