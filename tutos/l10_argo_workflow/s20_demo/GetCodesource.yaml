@@ -7,30 +7,14 @@ spec:
   # Create a pvc for the workflow
   volumeClaimTemplates:
     - metadata:
-        name: workflow-code
-      spec:
-        accessModes: [ "ReadOnlyMany" ]
-        resources:
-          requests:
-            storage: 100Mi
-    - metadata:
-        name: workflow-input
-      spec:
-        accessModes: [ "ReadOnlyMany" ]
-        resources:
-          requests:
-            storage: 10Gi
-    - metadata:
         name: workflow-tmp
       spec:
-        accessModes: [ "ReadWriteMany" ]
-        resources:
-          requests:
-            storage: 10Gi
-    - metadata:
-        name: workflow-output
-      spec:
-        accessModes: [ "ReadWriteMany" ]
+        # The CephFS storage class accept three access mode:
+        # ReadWriteOnce
+        # ReadOnlyMany
+        # ReadWriteMany
+        # But not the rook-ceph-block storage class. It only supports ReadWriteOnce
+        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
             storage: 10Gi
@@ -50,7 +34,7 @@ spec:
             s3:
               endpoint: minio.lab.sspcloud.fr
               bucket: argo-artifacts
-              key: tmp
+              key: data-pipeline/demo/input
               accessKeySecret:
                 name: prod-minio-cred
                 key: accessKey
@@ -58,15 +42,11 @@ spec:
                 name: prod-minio-cred
                 key: secretKey
       container:
-        image: debian
+        image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["ls -l /mnt/bin /mnt/input"]
+        args:
+          - "ls -l /mnt/bin /mnt/input"
+          - "python -V"
         volumeMounts:
-          - name: workflow-code
-            mountPath: /persistent/bin
-          - name: workflow-input
-            mountPath: /persistent/input
           - name: workflow-tmp
             mountPath: /persistent/tmp
-          - name: workflow-output
-            mountPath: /persistent/output
