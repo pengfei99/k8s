@@ -94,7 +94,10 @@ spec:
               - 4
               - 5
               - 6
-
+          # task 13: Save results to s3
+          - name: save-result-to-s3
+            dependencies: [get-best-pokemon-of-each-generation,predict-legendary-pokemon,get-all-time-best-pokemon]
+            template:
     ####################################################################################################################
     #################### task template for implementing the logic of each task of the pipeline #########################
     ####################################################################################################################
@@ -251,12 +254,12 @@ spec:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/data_transformation/GeneratePokemonByGeneration.py
-               /tmp pokemon-gen"]
+               /mnt/tmp/pokemon-enriched.csv /tmp pokemon-gen"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
 
-    # worker template for task-12 split-pokemon-by-generation-wt
+    # worker template for task-12
     - name: get-best-pokemon-of-each-generation-wt
       inputs:
         parameters:
