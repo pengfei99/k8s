@@ -257,7 +257,7 @@ spec:
             mountPath: /mnt
 
     # worker template for task-12 split-pokemon-by-generation-wt
-    - name: get-best-pokemon-of-each-generation
+    - name: get-best-pokemon-of-each-generation-wt
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
