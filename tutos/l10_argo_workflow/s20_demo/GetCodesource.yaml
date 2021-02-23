@@ -51,7 +51,7 @@ spec:
           # task 5: remove duplicated rows,this task is activated when task 1 detects duplication
           - name: remove-duplicated-rows
             dependencies: [check-duplicated-rows,check-missing-value]
-            template: remove-duplicated-rows
+            template: remove-duplicated-rows-wt
             when: "{{tasks.check-duplicated-rows.outputs.has-duplicated-rows}} == True"
 
 
@@ -143,7 +143,7 @@ spec:
             mountPath: /mnt
 
     # worker template for task-5 remove duplicated rows
-    - name: check-data-schema-wt
+    - name: remove-duplicated-rows-wt
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
