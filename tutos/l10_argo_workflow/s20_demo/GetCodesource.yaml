@@ -34,9 +34,11 @@ spec:
             template: load-code-and-data-wt
           # task 1: check duplicated rows
           - name: check-duplicated-rows
+            dependencies: [load-code-and-data-wt]
             template: check-duplicated-rows-wt
           # task 2: check missing values
           - name: check-missing-value
+            dependencies: [load-code-and-data-wt]
             template: check-missing-value-wt
           # sidecar task: persist data quality check outputs to s3
 #          - name: persist-quality-output
@@ -72,6 +74,7 @@ spec:
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
+
     # worker template for task-1 check-duplicated-rows
     - name: check-duplicated-rows-wt
 #      inputs:
