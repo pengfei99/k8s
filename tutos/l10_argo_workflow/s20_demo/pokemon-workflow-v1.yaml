@@ -258,6 +258,9 @@ spec:
 
     # worker template for task-12 split-pokemon-by-generation-wt
     - name: get-best-pokemon-of-each-generation-wt
+      inputs:
+        parameters:
+          - name: input-file-name
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
