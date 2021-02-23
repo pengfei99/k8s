@@ -41,7 +41,7 @@ spec:
             dependencies: [load-code-and-data]
             template: check-missing-value-wt
           # task 3: check data set shape
-          - name: check-data-shape
+          - name: check-raw-data-shape
             dependencies: [load-code-and-data]
             template: check-data-shape-wt
           # task 4: check missing values
@@ -53,6 +53,20 @@ spec:
             dependencies: [check-duplicated-rows,check-missing-value]
             template: remove-duplicated-rows-wt
             when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == True"
+          # task 6: rename column name
+          - name: rename-column
+            dependencies: [remove-duplicated-rows]
+            template: rename-column-wt
+          # task 7: enrich data with new columns
+          - name: enrich-data
+            dependencies: [rename-column]
+            template: enrich-data-wt
+          # task 8: check data shape after data enriched
+          - name: check-enriched-data-shape
+            dependencies: [enrich-data]
+            template: check-data-shape-wt
+
+
 
 
 
@@ -153,5 +167,26 @@ spec:
           - name: workflow-tmp
             mountPath: /mnt
 
+    # worker template for task-6 rename columns
+    - name: rename-column-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_cleaning/RenameColumns.py
+                /mnt/tmp/pokemon-dedup.csv /mnt/tmp/pokemon-cleaned.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-7 enrich data
+    - name: enrich-data-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_transformation/GenerateAttackDefModeScore.py
+               /mnt/tmp/pokemon-cleaned.csv /mnt/tmp/pokemon-enriched.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
 #    # worker template for task-2 check-missing-values
 #    - name:
