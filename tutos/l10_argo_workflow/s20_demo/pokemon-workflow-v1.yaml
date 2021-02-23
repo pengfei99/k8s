@@ -303,14 +303,22 @@ spec:
         image: busybox
         command: [sh, -c]
         args: ["echo save {{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}
-                to s3://minio.lab.sspcloud.fr/argo-artifacts/tmp/"]
+                to s3://minio.lab.sspcloud.fr/argo-artifacts/tmp/;
+                cp {{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}
+                   /tmp/{{inputs.parameters.file-name}}"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
+          - name: out
+            mountPath: /tmp
+      # k8sapi executor does not support outputs from base image laye, have to use a emptyDir
+      volumes:
+        - name: out
+          emptyDir: { }
       outputs:
         artifacts:
           - name: output-file
-            path: "{{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}"
+            path: "/tmp/{{inputs.parameters.file-name}}"
             s3:
               endpoint: minio.lab.sspcloud.fr
               bucket: argo-artifacts
