@@ -71,8 +71,12 @@ spec:
               parameters:
               - name: input-data-path
                 value: /mnt/tmp/pokemon-enriched.csv
+              - name: code-path
+                value: bin/src/data_info/CheckShape.py
               - name: volume-name
                 value: workflow-tmp
+              - name: volume-mount-path
+                value: /mnt
 
 
 

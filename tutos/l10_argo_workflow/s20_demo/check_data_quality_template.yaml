@@ -6,34 +6,41 @@ spec:
   # The default entry point is get shape
   entrypoint: check-data-shape-wt
   templates:
+    # First template for checking the shape of data set
     - name: check-data-shape-wt
       inputs:
         parameters:
           - name: input-data-path
+          - name: code-path
           - name: volume-name
+          - name: volume-mount-path
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["python -V && python /mnt/bin/src/data_info/CheckShape.py
+        args: ["python -V && python {{inputs.parameters.volume-mount-path}}/{{inputs.parameters.code-path}}
                {{inputs.parameters.input-data-path}}"]
         volumeMounts:
           - name: "{{inputs.parameters.volume-name}}"
-            mountPath: /mnt
+            mountPath: "{{inputs.parameters.volume-mount-path}}"
 
-#    - name: backup
-#      inputs:
-#        parameters:
-#          - name: message
-#      container:
-#        image: busybox
-#        args: ["echo", "backup template prints {{inputs.parameters.message}}"]
-#        imagePullPolicy: IfNotPresent
-#   # exit handler template
-#    - name: exit-handler
-#      container:
-#        image: busybox
-#        args: ["echo", "Exit Handler"]
-#        imagePullPolicy: IfNotPresent
+    # Second template for checking the schema of data set
+    - name: check-data-shape-wt
+      inputs:
+        parameters:
+          - name: input-data-path
+          - name: code-path
+          - name: volume-name
+          - name: volume-mount-path
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python {{inputs.parameters.volume-mount-path}}/{{inputs.parameters.code-path}}
+               {{inputs.parameters.input-data-path}}"]
+        volumeMounts:
+          - name: "{{inputs.parameters.volume-name}}"
+            mountPath: "{{inputs.parameters.volume-mount-path}}"
+
+
 
 # To submit a workflow template
 # argo template create path/to/template.yaml
