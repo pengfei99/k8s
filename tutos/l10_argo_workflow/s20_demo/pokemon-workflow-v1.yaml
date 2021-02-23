@@ -265,7 +265,7 @@ spec:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/basic_stats/GetBestPokemon.py
-               /tmp/{{inputs.parameters.input-file-name}}"]
+               /mnt/tmp/{{inputs.parameters.input-file-name}}"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt

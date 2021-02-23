@@ -43,7 +43,19 @@ spec:
           # task 3: check data set shape
           - name: check-raw-data-shape
             dependencies: [load-code-and-data]
-            template: check-data-shape-wt
+            templateRef:
+              name: check-data-quality
+              template: check-data-shape-wt
+              arguments:
+                parameters:
+                  - name: input-data-path
+                    value: /mnt/tmp/pokemon-bad.csv
+                  - name: code-path
+                    value: bin/src/data_info/CheckShape.py
+                  - name: volume-name
+                    value: workflow-tmp
+                  - name: volume-mount-path
+                    value: /mnt
           # task 4: check missing values
           - name: check-data-schema
             dependencies: [load-code-and-data]
@@ -146,16 +158,8 @@ spec:
           - name: workflow-tmp
             mountPath: /mnt
 
-    # worker template for task-3 check-data-shape
-    - name: check-data-shape-wt
-      container:
-        image: liupengfei99/python38-ds
-        command: [sh, -c]
-        args: ["python -V && python /mnt/bin/src/data_info/CheckShape.py
-               /mnt/input/pokemon-bad.csv"]
-        volumeMounts:
-          - name: workflow-tmp
-            mountPath: /mnt
+    # worker template for task-3 check-data-shape is from the Global template
+
 
     # worker template for task-4 check-data-schema
     - name: check-data-schema-wt
@@ -200,5 +204,3 @@ spec:
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
-#    # worker template for task-2 check-missing-values
-#    - name:
