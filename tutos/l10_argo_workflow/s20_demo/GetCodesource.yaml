@@ -4,10 +4,10 @@ metadata:
   generateName: demo-
 spec:
   # ttlStrategy defines how pobs are treated after workflow completed
-#  ttlStrategy:
-#    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
-#    secondsAfterSuccess: 5     # Time to live after workflow is successful
-#    secondsAfterFailure: 5     # Time to live after workflow fails
+  #  ttlStrategy:
+  #    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+  #    secondsAfterSuccess: 5     # Time to live after workflow is successful
+  #    secondsAfterFailure: 5     # Time to live after workflow fails
   entrypoint: main
   # Create a pvc for the workflow
   volumeClaimTemplates:
@@ -40,9 +40,19 @@ spec:
           - name: check-missing-value
             dependencies: [load-code-and-data]
             template: check-missing-value-wt
+          # task 3: check data set shape
+          - name: check-data-shape
+            dependencies: [load-code-and-data]
+            template: check-data-shape-wt
+          # task 4: check missing values
+          - name: check-data-schema
+            dependencies: [load-code-and-data]
+            template: check-data-schema-wt
+
+
           # sidecar task: persist data quality check outputs to s3
-#          - name: persist-quality-output
-#            template: persist-quality-output-wt
+    #          - name: persist-quality-output
+    #            template: persist-quality-output-wt
 
     # worker template for task-0 load code source and data
     - name: load-code-and-data-wt
@@ -68,9 +78,9 @@ spec:
                 name: prod-minio-cred
                 key: secretKey
       container:
-        image: liupengfei99/python38-ds
+        image: busybox
         command: [sh, -c]
-        args: ["ls -l /mnt/bin /mnt/input; mkdir -p /mnt/tmp; mkdir -p /mnt/output"]
+        args: ["mkdir -p /mnt/tmp /mnt/output; ls -l /mnt/bin /mnt/input /mnt/tmp /mnt/output"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
@@ -80,7 +90,7 @@ spec:
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["ls -l /mnt /mnt/bin /mnt/input; python -V && python /mnt/bin/src/data_quality/CheckDuplication.py
+        args: ["python -V && python /mnt/bin/src/data_quality/CheckDuplication.py
                /mnt/input/pokemon-bad.csv | tee /mnt/tmp/Duplicated_rows.txt"]
         volumeMounts:
           - name: workflow-tmp
@@ -91,11 +101,32 @@ spec:
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["ls -l /mnt/bin /mnt/input; python -V && python /mnt/bin/src/data_quality/CheckMissingValue.py
+        args: ["python -V && python /mnt/bin/src/data_quality/CheckMissingValue.py
                    /mnt/input/pokemon-bad.csv | tee /mnt/tmp/MissingValue.txt"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
 
+    # worker template for task-3 check-data-shape
+    - name: check-data-shape-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_info/CheckSchema.py
+               /mnt/input/pokemon-bad.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-4 check-data-schema
+    - name: check-data-schema-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_info/CheckSchema.py
+               /mnt/input/pokemon-bad.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
 #    # worker template for task-2 check-missing-values
 #    - name:
