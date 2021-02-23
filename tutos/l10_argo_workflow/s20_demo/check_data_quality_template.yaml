@@ -24,7 +24,7 @@ spec:
             mountPath: "{{inputs.parameters.volume-mount-path}}"
 
     # Second template for checking the schema of data set
-    - name: check-data-shape-wt
+    - name: check-data-schema-wt
       inputs:
         parameters:
           - name: input-data-path

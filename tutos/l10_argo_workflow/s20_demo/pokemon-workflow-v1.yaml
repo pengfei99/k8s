@@ -25,7 +25,9 @@ spec:
             storage: 10Gi
 
   templates:
-    # main template for planning dag of the pipeline
+  #############################################################################################
+  #################### main template for planning dag of the pipeline #########################
+  #############################################################################################
     - name: main
       dag:
         tasks:
@@ -43,7 +45,7 @@ spec:
           # task 3: check data set shape
           - name: check-raw-data-shape
             dependencies: [load-code-and-data]
-            template: check-data-shape-wt
+            template: check-raw-data-shape-wt
           # task 4: check missing values
           - name: check-data-schema
             dependencies: [load-code-and-data]
@@ -57,23 +59,29 @@ spec:
           - name: rename-column
             dependencies: [remove-duplicated-rows]
             template: rename-column-wt
-          # task 7: enrich data with new columns
+          # task 7: enrich data by adding new pokemon score columns
           - name: enrich-data
             dependencies: [rename-column]
             template: enrich-data-wt
           # task 8: check data shape after data enriched
           - name: check-enriched-data-shape
             dependencies: [enrich-data]
-            template: check-data-shape-wt
-
-
-
-
-
-          # sidecar task: persist data quality check outputs to s3
-    #          - name: persist-quality-output
-    #            template: persist-quality-output-wt
-
+            template: check-enriched-data-shape-wt
+          # task 9: ml for legendary pokemon
+          - name: predict-legendary-pokemon
+            dependencies: [rename-column]
+            template: predict-legendary-pokemon-wt
+          # task 10: Get top 5 best pokemon of all generation
+          - name: get-all-time-best-pokemon
+            dependencies: [enrich-data]
+            template: get-all-time-best-pokemon-wt
+          # task 11: split pokemon by their generation
+          - name: split-pokemon-by-generation
+            dependencies: [enrich-data]
+            template: split-pokemon-by-generation-wt
+    ####################################################################################################################
+    #################### task template for implementing the logic of each task of the pipeline #########################
+    ####################################################################################################################
     # worker template for task-0 load code source and data
     - name: load-code-and-data-wt
       inputs:
@@ -135,7 +143,7 @@ spec:
             mountPath: /mnt
 
     # worker template for task-3 check-data-shape
-    - name: check-data-shape-wt
+    - name: check-raw-data-shape-wt
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
@@ -188,5 +196,46 @@ spec:
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
-#    # worker template for task-2 check-missing-values
-#    - name:
+
+    # worker template for task-8 check-enriched-data-shape
+    - name: check-enriched-data-shape-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_info/CheckShape.py
+               /mnt/tmp/pokemon-enriched.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-9 predict-legendary-pokemon
+    - name: predict-legendary-pokemon-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/legendary_ml/LegendaryPokemonDT.py /mnt/tmp/pokemon-cleaned.csv
+               /mnt/tmp/random_forest_pokemon_legendary_classifier.sav"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-10 get-all-time-best-pokemon-wt
+    - name: get-all-time-best-pokemon-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/basic_stats/GetBestPokemon.py /mnt/tmp/pokemon-enriched.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-10 get-all-time-best-pokemon-wt
+    - name: split-pokemon-by-generation-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_transformation/GeneratePokemonByGeneration.py
+               /tmp pokemon-gen"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
