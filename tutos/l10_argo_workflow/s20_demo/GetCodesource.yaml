@@ -41,8 +41,9 @@ spec:
           # sidecar task: persist data quality check outputs to s3
 #          - name: persist-quality-output
 #            template: persist-quality-output-wt
-    # worker template for task-1 check-duplicated-rows
-    - name: check-duplicated-rows-wt
+
+    # worker template for task-0 load code source and data
+    - name: load-code-and-data-wt
       inputs:
         artifacts:
           # Check out the master branch of the argo repo and place it at /src
