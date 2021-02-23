@@ -103,11 +103,11 @@ spec:
             mountPath: /mnt
       outputs:
         parameters:
-        - name: has-duplicated-rows
-          valueFrom:
-            # Default value to use if retrieving valueFrom fails. If not provided workflow will fail instead
-            default: "True"
-            path: /mnt/tmp/output-params.txt
+          - name: has-duplicated-rows
+            valueFrom:
+              # Default value to use if retrieving valueFrom fails. If not provided workflow will fail instead
+              default: "True"
+              path: /mnt/tmp/output-params.txt
 
     # worker template for task-2 check-missing-values
     - name: check-missing-value-wt
@@ -147,7 +147,8 @@ spec:
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["python -V && python RemoveDuplicatedRows.py /mnt/input/pokemon-bad.csv /mnt/tmp/pokemon-dedup.csv"]
+        args: ["python -V && python /mnt/bin/src/data_cleaning/RemoveDuplicatedRows.py
+               /mnt/input/pokemon-bad.csv /mnt/tmp/pokemon-dedup.csv"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
