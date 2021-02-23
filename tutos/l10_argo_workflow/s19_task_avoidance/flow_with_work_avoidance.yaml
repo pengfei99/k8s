@@ -54,7 +54,9 @@ spec:
       inputs:
         artifacts:
           - name: markers
+            # Here we mount pvc at /work and artifact at /work/markers
             path: /work/markers
+            # optional true is for artifact
             optional: true
             s3:
               key: work-avoidance-markers/markers.tgz

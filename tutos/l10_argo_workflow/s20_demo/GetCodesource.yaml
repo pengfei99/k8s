@@ -3,6 +3,11 @@ kind: Workflow
 metadata:
   generateName: demo-
 spec:
+  # ttlStrategy defines how pobs are treated after workflow completed
+  ttlStrategy:
+    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+    secondsAfterSuccess: 5     # Time to live after workflow is successful
+    secondsAfterFailure: 5     # Time to live after workflow fails
   entrypoint: main
   # Create a pvc for the workflow
   volumeClaimTemplates:
@@ -23,14 +28,19 @@ spec:
     # main template for planning dag of the pipeline
     - name: main
       dag:
-        # task 1: check duplicated rows
         tasks:
+          # task 0: load code source and data
+          - name: load-code-and-data
+            template: load-code-and-data-wt
+          # task 1: check duplicated rows
           - name: check-duplicated-rows
             template: check-duplicated-rows-wt
-        # task 2: check missing values
+          # task 2: check missing values
           - name: check-missing-value
             template: check-missing-value-wt
-
+          # sidecar task: persist data quality check outputs to s3
+#          - name: persist-quality-output
+#            template: persist-quality-output-wt
     # worker template for task-1 check-duplicated-rows
     - name: check-duplicated-rows-wt
       inputs:
@@ -57,40 +67,73 @@ spec:
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["ls -l /mnt/bin /mnt/input; python -V && python /mnt/bin/src/data_quality/CheckDuplication.py
-               /mnt/input/pokemon-bad.csv"]
+        args: ["ls -l /mnt/bin /mnt/input; mkdir -p /mnt/tmp; mkdir -p /mnt/output"]
         volumeMounts:
           - name: workflow-tmp
-            mountPath: /persistent/tmp
+            mountPath: /mnt
+    # worker template for task-1 check-duplicated-rows
+    - name: check-duplicated-rows-wt
+#      inputs:
+#        artifacts:
+#          # Check out the master branch of the argo repo and place it at /src
+#          # revision can be anything that git checkout accepts: branch, commit, tag, etc.
+#          - name: code
+#            path: /mnt/bin
+#            git:
+#              repo: https://github.com/pengfei99/argoDataPipeline.git
+#              revision: "main"
+#          - name: input-data
+#            path: /mnt/input
+#            s3:
+#              endpoint: minio.lab.sspcloud.fr
+#              bucket: argo-artifacts
+#              key: data-pipeline/demo/input
+#              accessKeySecret:
+#                name: prod-minio-cred
+#                key: accessKey
+#              secretKeySecret:
+#                name: prod-minio-cred
+#                key: secretKey
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["ls -l /mnt /mnt/bin /mnt/input; python -V && python /mnt/bin/src/data_quality/CheckDuplication.py
+               /mnt/input/pokemon-bad.csv | tee /persistent/tmp/MissingValue.txt"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
 
     # worker template for task-2 check-missing-values
     - name: check-missing-value-wt
-      inputs:
-        artifacts:
-          # Check out the master branch of the argo repo and place it at /src
-          # revision can be anything that git checkout accepts: branch, commit, tag, etc.
-          - name: code
-            path: /mnt/bin
-            git:
-              repo: https://github.com/pengfei99/argoDataPipeline.git
-              revision: "main"
-          - name: input-data
-            path: /mnt/input
-            s3:
-              endpoint: minio.lab.sspcloud.fr
-              bucket: argo-artifacts
-              key: data-pipeline/demo/input
-              accessKeySecret:
-                name: prod-minio-cred
-                key: accessKey
-              secretKeySecret:
-                name: prod-minio-cred
-                key: secretKey
+#      inputs:
+#        artifacts:
+#          # Check out the master branch of the argo repo and place it at /src
+#          # revision can be anything that git checkout accepts: branch, commit, tag, etc.
+#          - name: code
+#            path: /mnt/bin
+#            git:
+#              repo: https://github.com/pengfei99/argoDataPipeline.git
+#              revision: "main"
+#          - name: input-data
+#            path: /mnt/input
+#            s3:
+#              endpoint: minio.lab.sspcloud.fr
+#              bucket: argo-artifacts
+#              key: data-pipeline/demo/input
+#              accessKeySecret:
+#                name: prod-minio-cred
+#                key: accessKey
+#              secretKeySecret:
+#                name: prod-minio-cred
+#                key: secretKey
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["ls -l /mnt/bin /mnt/input; python -V && python /mnt/bin/src/data_quality/CheckMissingValue.py
-                   /mnt/input/pokemon-bad.csv > /persistent/tmp/MissingValue.txt"]
+                   /mnt/input/pokemon-bad.csv | tee /persistent/tmp/MissingValue.txt"]
         volumeMounts:
           - name: workflow-tmp
-            mountPath: /persistent/tmp
+            mountPath: /mnt
+
+#    # worker template for task-2 check-missing-values
+#    - name:

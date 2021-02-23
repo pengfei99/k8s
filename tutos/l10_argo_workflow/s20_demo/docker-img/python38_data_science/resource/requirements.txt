@@ -16,3 +16,4 @@ seaborn
 bokeh
 plotly
 pydot
+fastparquet
