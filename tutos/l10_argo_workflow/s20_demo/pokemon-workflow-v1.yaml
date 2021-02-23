@@ -9,6 +9,16 @@ spec:
   #    secondsAfterSuccess: 5     # Time to live after workflow is successful
   #    secondsAfterFailure: 5     # Time to live after workflow fails
   entrypoint: main
+  arguments:
+    parameters:
+      - name: output-file-list
+        value: |
+          [
+            { "file-path": "/mnt/tmp", "file-name": "pokemon-enriched.csv" },
+            { "file-path": "/mnt/tmp", "file-name": "random_forest_pokemon_legendary_classifier.sav" },
+            { "file-path": "/mnt/tmp", "file-name": "pokemon-ml-output.txt" },
+            { "file-path": "/mnt/tmp", "file-name": "top-5-pokemon.csv" }
+          ]
   # Create a pvc for the workflow
   volumeClaimTemplates:
     - metadata:
@@ -97,7 +107,15 @@ spec:
           # task 13: Save results to s3
           - name: save-result-to-s3
             dependencies: [get-best-pokemon-of-each-generation,predict-legendary-pokemon,get-all-time-best-pokemon]
-            template:
+            template: save-result-to-s3-wt
+            arguments:
+              parameters:
+                - name: file-path
+                  value: "{{item.file-path}}"
+                - name: file-name
+                  value: "{{item.file-name}}"
+            # pass the inputs to the step "withParam"
+            withParam: "{{workflow.parameters.output-file-list}}"
     ####################################################################################################################
     #################### task template for implementing the logic of each task of the pipeline #########################
     ####################################################################################################################
@@ -233,7 +251,8 @@ spec:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/legendary_ml/LegendaryPokemonDT.py /mnt/tmp/pokemon-cleaned.csv
-               /mnt/tmp/random_forest_pokemon_legendary_classifier.sav"]
+               /mnt/tmp/random_forest_pokemon_legendary_classifier.sav
+               | tee /mnt/tmp/pokemon-ml-output.txt"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
@@ -243,7 +262,8 @@ spec:
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
-        args: ["python -V && python /mnt/bin/src/basic_stats/GetBestPokemon.py /mnt/tmp/pokemon-enriched.csv"]
+        args: ["python -V && python /mnt/bin/src/basic_stats/GetBestPokemon.py /mnt/tmp/pokemon-enriched.csv
+                | tee /mnt/tmp/top-5-pokemon.csv"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
@@ -254,12 +274,12 @@ spec:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/data_transformation/GeneratePokemonByGeneration.py
-               /mnt/tmp/pokemon-enriched.csv /tmp pokemon-gen"]
+               /mnt/tmp/pokemon-enriched.csv /mnt/tmp pokemon-gen"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
 
-    # worker template for task-12
+    # worker template for task-12 get-best-pokemon-of-each-generation-wt
     - name: get-best-pokemon-of-each-generation-wt
       inputs:
         parameters:
@@ -272,3 +292,32 @@ spec:
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
+
+    # worker template for task-13
+    - name: save-result-to-s3-wt
+      inputs:
+        parameters:
+          - name: file-name
+          - name: file-path
+      container:
+        image: busybox
+        command: [sh, -c]
+        args: ["echo save {{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}
+                to s3://minio.lab.sspcloud.fr/argo-artifacts/tmp/"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+      outputs:
+        artifacts:
+          - name: output-file
+            path: "{{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}"
+            s3:
+              endpoint: minio.lab.sspcloud.fr
+              bucket: argo-artifacts
+              key: "tmp/{{inputs.parameters.file-name}}.tgz"
+              accessKeySecret:
+                name: prod-minio-cred
+                key: accessKey
+              secretKeySecret:
+                name: prod-minio-cred
+                key: secretKey
