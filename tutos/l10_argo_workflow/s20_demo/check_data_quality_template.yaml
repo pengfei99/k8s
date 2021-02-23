@@ -11,14 +11,14 @@ spec:
         parameters:
           - name: input-data-path
           - name: volume-name
-        container:
-          image: liupengfei99/python38-ds
-          command: [sh, -c]
-          args: ["python -V && python /mnt/bin/src/data_info/CheckShape.py
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_info/CheckShape.py
                {{inputs.parameters.input-data-path}}"]
-          volumeMounts:
-            - name: {{inputs.parameters.input-data-path}}
-              mountPath: /mnt
+        volumeMounts:
+          - name: "{{inputs.parameters.volume-name}}"
+            mountPath: /mnt
 
 #    - name: backup
 #      inputs:
