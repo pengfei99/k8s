@@ -25,9 +25,9 @@ spec:
             storage: 10Gi
 
   templates:
-  #############################################################################################
-  #################### main template for planning dag of the pipeline #########################
-  #############################################################################################
+    #############################################################################################
+    #################### main template for planning dag of the pipeline #########################
+    #############################################################################################
     - name: main
       dag:
         tasks:
@@ -79,6 +79,22 @@ spec:
           - name: split-pokemon-by-generation
             dependencies: [enrich-data]
             template: split-pokemon-by-generation-wt
+          # task 12: Get top 5 best pokemon of each generation
+          - name: get-best-pokemon-of-each-generation
+            dependencies: [split-pokemon-by-generation]
+            template: get-best-pokemon-of-each-generation-wt
+            arguments:
+              parameters:
+                - name: input-file-name
+                  value: "pokemon-gen-{{item}}.csv"
+            withItems:
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              - 6
+
     ####################################################################################################################
     #################### task template for implementing the logic of each task of the pipeline #########################
     ####################################################################################################################
@@ -229,13 +245,24 @@ spec:
           - name: workflow-tmp
             mountPath: /mnt
 
-    # worker template for task-10 get-all-time-best-pokemon-wt
+    # worker template for task-11 split-pokemon-by-generation-wt
     - name: split-pokemon-by-generation-wt
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/data_transformation/GeneratePokemonByGeneration.py
                /tmp pokemon-gen"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-12 split-pokemon-by-generation-wt
+    - name: get-best-pokemon-of-each-generation
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/basic_stats/GetBestPokemon.py
+               /tmp/{{inputs.parameters.input-file-name}}"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
