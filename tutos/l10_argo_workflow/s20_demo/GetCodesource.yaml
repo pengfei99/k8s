@@ -52,7 +52,7 @@ spec:
           - name: remove-duplicated-rows
             dependencies: [check-duplicated-rows,check-missing-value]
             template: remove-duplicated-rows-wt
-            when: "{{tasks.check-duplicated-rows.outputs.has-duplicated-rows}} == True"
+            when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == True"
 
 
 
