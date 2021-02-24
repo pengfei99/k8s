@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: pokemon-workflow-daily
+spec:
+  schedule: "*/3 * * * *"
+  concurrencyPolicy: "Replace"
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  suspend: false
+  workflowSpec:
+    entrypoint: main
+    arguments:
+      parameters:
+        - name: output-file-list
+          value: |
+            [
+              { "file-path": "/mnt/tmp", "file-name": "pokemon-enriched.csv" }
+            ]
+        - name: git-code-source
+          value: https://github.com/pengfei99/argoDataPipeline.git
+        - name: s3-endpoint-name
+          value: minio.lab.sspcloud.fr
+        - name: s3-bucket-name
+          value: argo-artifacts
+        - name: data-input-path
+          value: data-pipeline/demo/input
+        - name: data-mount-path
+          value: /mnt/input
+        - name: input-file-name
+          value: pokemon-bad.csv
+    workflowTemplateRef:
+      name: pokemon-workflow-template
+#    clusterScope: true
