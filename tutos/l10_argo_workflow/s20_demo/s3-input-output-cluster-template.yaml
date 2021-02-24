@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
-kind: WorkflowTemplate
+kind: ClusterWorkflowTemplate
 metadata:
-  name: ClusterWorkflowTemplate
+  name: s3-input-output-template
 spec:
   entrypoint: s3-output
   arguments:
