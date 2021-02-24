@@ -14,6 +14,13 @@ spec:
           ]
       - name: git-code-source
         value: https://github.com/pengfei99/argoDataPipeline.git
+      - name: s3-endpoint-name
+        value: minio.lab.sspcloud.fr
+      - name: s3-bucket-name
+        value: argo-artifacts
+      - name: data-input-path
+        value: data-pipeline/demo/input
+
   volumeClaimTemplates:
     - metadata:
         name: workflow-tmp
@@ -116,9 +123,9 @@ spec:
           - name: input-data
             path: /mnt/input
             s3:
-              endpoint: minio.lab.sspcloud.fr
-              bucket: argo-artifacts
-              key: data-pipeline/demo/input
+              endpoint: "{{workflow.parameters.s3-endpoint-name}}"
+              bucket: "{{workflow.parameters.s3-bucket-name}}"
+              key: "{{workflow.parameters.data-input-path}}"
               accessKeySecret:
                 name: prod-minio-cred
                 key: accessKey
