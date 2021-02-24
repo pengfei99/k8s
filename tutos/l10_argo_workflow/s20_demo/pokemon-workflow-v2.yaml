@@ -12,6 +12,8 @@ spec:
             { "file-path": "/mnt/tmp", "file-name": "pokemon-enriched.csv" },
             { "file-path": "/mnt/tmp", "file-name": "pokemon-cleaned.csv" }
           ]
+      - name: git-code-source
+        value: https://github.com/pengfei99/argoDataPipeline.git
   volumeClaimTemplates:
     - metadata:
         name: workflow-tmp
@@ -109,7 +111,7 @@ spec:
           - name: code
             path: /mnt/bin
             git:
-              repo: https://github.com/pengfei99/argoDataPipeline.git
+              repo: "{{workflow.parameters.git-code-source}}"
               revision: "main"
           - name: input-data
             path: /mnt/input
