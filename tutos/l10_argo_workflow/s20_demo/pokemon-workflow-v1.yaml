@@ -65,9 +65,14 @@ spec:
             dependencies: [check-duplicated-rows,check-missing-value]
             template: remove-duplicated-rows-wt
             when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == True"
+          # task 5-1: if no duplicated rows, copy the input file
+          - name: copy-origin-input-file
+            dependencies: [check-duplicated-rows,check-missing-value]
+            template: copy-origin-input-file-wt
+            when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == False"
           # task 6: rename column name
           - name: rename-column
-            dependencies: [remove-duplicated-rows]
+            dependencies: [remove-duplicated-rows, copy-origin-input-file]
             template: rename-column-wt
           # task 7: enrich data by adding new pokemon score columns
           - name: enrich-data
@@ -208,6 +213,16 @@ spec:
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/data_cleaning/RemoveDuplicatedRows.py
                /mnt/input/pokemon-bad.csv /mnt/tmp/pokemon-dedup.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-5-1 remove duplicated rows
+    - name: remove-duplicated-rows-wt
+      container:
+        image: busybox
+        command: [sh, -c]
+        args: ["cp /mnt/input/Pokemon-for-demo.csv /mnt/tmp/pokemon-dedup.csv"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
