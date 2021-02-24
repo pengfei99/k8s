@@ -46,7 +46,7 @@ spec:
             arguments:
               parameters:
                 - name: input-data-path
-                  value: /mnt/tmp/pokemon-bad.csv
+                  value: /mnt/input/pokemon-bad.csv
                 - name: code-path
                   value: bin/src/data_info/CheckShape.py
                 - name: volume-name
@@ -86,9 +86,10 @@ spec:
                   value: workflow-tmp
                 - name: volume-mount-path
                   value: /mnt
+        # task 9: out put file
           - name: save-result-to-s3
-            dependencies: []
-            workflowTemplateRef:
+            dependencies: [enrich-data]
+            templateRef:
               name: s3-input-output-template
               template: s3-output
               clusterScope: true
@@ -207,3 +208,4 @@ spec:
             mountPath: /mnt
 
     # worker template for task-8 check-data-shape is from the Global template
+    # worker template for task-9 check-data-shape is from the Cluster template
