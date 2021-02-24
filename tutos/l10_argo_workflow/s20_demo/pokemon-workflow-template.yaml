@@ -14,6 +14,13 @@ spec:
           ]
       - name: git-code-source
         value: https://github.com/pengfei99/argoDataPipeline.git
+      - name: s3-endpoint-name
+        value: minio.lab.sspcloud.fr
+      - name: s3-bucket-name
+        value: argo-artifacts
+      - name: data-input-path
+        value: data-pipeline/demo/input
+
   volumeClaimTemplates:
     - metadata:
         name: workflow-tmp
@@ -88,7 +95,7 @@ spec:
                   value: workflow-tmp
                 - name: volume-mount-path
                   value: /mnt
-        # task 9: out put file
+          # task 9: out put file
           - name: save-result-to-s3
             dependencies: [enrich-data]
             templateRef:
@@ -116,9 +123,9 @@ spec:
           - name: input-data
             path: /mnt/input
             s3:
-              endpoint: minio.lab.sspcloud.fr
-              bucket: argo-artifacts
-              key: data-pipeline/demo/input
+              endpoint: "{{workflow.parameters.s3-endpoint-name}}"
+              bucket: "{{workflow.parameters.s3-bucket-name}}"
+              key: "{{workflow.parameters.data-input-path}}"
               accessKeySecret:
                 name: prod-minio-cred
                 key: accessKey
@@ -208,6 +215,3 @@ spec:
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
-
-    # worker template for task-8 check-data-shape is from the Global template
-    # worker template for task-9 check-data-shape is from the Cluster template

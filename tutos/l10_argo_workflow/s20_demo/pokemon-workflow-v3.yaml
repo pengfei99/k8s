@@ -11,6 +11,14 @@ spec:
           [
             { "file-path": "/mnt/tmp", "file-name": "pokemon-enriched.csv" }
           ]
+      - name: git-code-source
+        value: https://github.com/pengfei99/argoDataPipeline.git
+      - name: s3-endpoint-name
+        value: minio.lab.sspcloud.fr
+      - name: s3-bucket-name
+        value: argo-artifacts
+      - name: data-input-path
+        value: data-pipeline/demo/input
   workflowTemplateRef:
     name: pokemon-workflow-template
 #    clusterScope: true
