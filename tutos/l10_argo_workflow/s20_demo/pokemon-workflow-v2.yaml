@@ -1,24 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: demo-
+  generateName: pokemon-workflow-v2-
 spec:
-  # ttlStrategy defines how pobs are treated after workflow completed
-  #  ttlStrategy:
-  #    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
-  #    secondsAfterSuccess: 5     # Time to live after workflow is successful
-  #    secondsAfterFailure: 5     # Time to live after workflow fails
   entrypoint: main
-  # Create a pvc for the workflow
+  arguments:
+    parameters:
+      - name: output-file-list
+        value: |
+          [
+            { "file-path": "/mnt/tmp", "file-name": "pokemon-enriched.csv" },
+            { "file-path": "/mnt/tmp", "file-name": "pokemon-cleaned.csv" }
+          ]
   volumeClaimTemplates:
     - metadata:
         name: workflow-tmp
       spec:
-        # The CephFS storage class accept three access mode:
-        # ReadWriteOnce
-        # ReadOnlyMany
-        # ReadWriteMany
-        # But not the rook-ceph-block storage class. It only supports ReadWriteOnce
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
@@ -40,7 +37,7 @@ spec:
           - name: check-missing-value
             dependencies: [load-code-and-data]
             template: check-missing-value-wt
-          # task 3: check data set shape
+          # task 3: check raw data set shape
           - name: check-raw-data-shape
             dependencies: [load-code-and-data]
             templateRef:
@@ -81,23 +78,27 @@ spec:
               template: check-data-shape-wt
             arguments:
               parameters:
-              - name: input-data-path
-                value: /mnt/tmp/pokemon-enriched.csv
-              - name: code-path
-                value: bin/src/data_info/CheckShape.py
-              - name: volume-name
-                value: workflow-tmp
-              - name: volume-mount-path
-                value: /mnt
-
-
-
-
-
-          # sidecar task: persist data quality check outputs to s3
-    #          - name: persist-quality-output
-    #            template: persist-quality-output-wt
-
+                - name: input-data-path
+                  value: /mnt/tmp/pokemon-enriched.csv
+                - name: code-path
+                  value: bin/src/data_info/CheckShape.py
+                - name: volume-name
+                  value: workflow-tmp
+                - name: volume-mount-path
+                  value: /mnt
+          - name: save-result-to-s3
+            dependencies: []
+            workflowTemplateRef:
+              name: s3-input-output-template
+              template: s3-output
+              clusterScope: true
+            arguments:
+              parameters:
+                - name: file-path
+                  value: "{{item.file-path}}"
+                - name: file-name
+                  value: "{{item.file-name}}"
+            withParam: "{{workflow.parameters.output-file-list}}"
     # worker template for task-0 load code source and data
     - name: load-code-and-data-wt
       inputs:
@@ -204,3 +205,5 @@ spec:
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
+
+    # worker template for task-8 check-data-shape is from the Global template

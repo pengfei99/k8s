@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: demo-
+  generateName: pokemon-workflow-v1-
 spec:
   # ttlStrategy defines how pobs are treated after workflow completed
   #  ttlStrategy:
