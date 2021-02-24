@@ -1,0 +1,211 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterWorkflowTemplate
+metadata:
+  name: pokemon-workflow-template
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: output-file-list
+        value: |
+          [
+            { "file-path": "/mnt/tmp", "file-name": "pokemon-enriched.csv" },
+            { "file-path": "/mnt/tmp", "file-name": "pokemon-cleaned.csv" }
+          ]
+  volumeClaimTemplates:
+    - metadata:
+        name: workflow-tmp
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+
+  templates:
+    # main template for planning dag of the pipeline
+    - name: main
+      dag:
+        tasks:
+          # task 0: load code source and data
+          - name: load-code-and-data
+            template: load-code-and-data-wt
+          # task 1: check duplicated rows
+          - name: check-duplicated-rows
+            dependencies: [load-code-and-data]
+            template: check-duplicated-rows-wt
+          # task 2: check missing values
+          - name: check-missing-value
+            dependencies: [load-code-and-data]
+            template: check-missing-value-wt
+          # task 3: check raw data set shape
+          - name: check-raw-data-shape
+            dependencies: [load-code-and-data]
+            templateRef:
+              name: check-data-quality
+              template: check-data-shape-wt
+            arguments:
+              parameters:
+                - name: input-data-path
+                  value: /mnt/input/pokemon-bad.csv
+                - name: code-path
+                  value: bin/src/data_info/CheckShape.py
+                - name: volume-name
+                  value: workflow-tmp
+                - name: volume-mount-path
+                  value: /mnt
+          # task 4: check missing values
+          - name: check-data-schema
+            dependencies: [load-code-and-data]
+            template: check-data-schema-wt
+          # task 5: remove duplicated rows,this task is activated when task 1 detects duplication
+          - name: remove-duplicated-rows
+            dependencies: [check-duplicated-rows,check-missing-value]
+            template: remove-duplicated-rows-wt
+            when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == True"
+          # task 6: rename column name
+          - name: rename-column
+            dependencies: [remove-duplicated-rows]
+            template: rename-column-wt
+          # task 7: enrich data with new columns
+          - name: enrich-data
+            dependencies: [rename-column]
+            template: enrich-data-wt
+          # task 8: check data shape after data enriched
+          - name: check-enriched-data-shape
+            dependencies: [enrich-data]
+            templateRef:
+              name: check-data-quality
+              template: check-data-shape-wt
+            arguments:
+              parameters:
+                - name: input-data-path
+                  value: /mnt/tmp/pokemon-enriched.csv
+                - name: code-path
+                  value: bin/src/data_info/CheckShape.py
+                - name: volume-name
+                  value: workflow-tmp
+                - name: volume-mount-path
+                  value: /mnt
+        # task 9: out put file
+          - name: save-result-to-s3
+            dependencies: [enrich-data]
+            templateRef:
+              name: s3-input-output-template
+              template: s3-output
+              clusterScope: true
+            arguments:
+              parameters:
+                - name: file-path
+                  value: "{{item.file-path}}"
+                - name: file-name
+                  value: "{{item.file-name}}"
+            withParam: "{{workflow.parameters.output-file-list}}"
+    # worker template for task-0 load code source and data
+    - name: load-code-and-data-wt
+      inputs:
+        artifacts:
+          # Check out the master branch of the argo repo and place it at /src
+          # revision can be anything that git checkout accepts: branch, commit, tag, etc.
+          - name: code
+            path: /mnt/bin
+            git:
+              repo: https://github.com/pengfei99/argoDataPipeline.git
+              revision: "main"
+          - name: input-data
+            path: /mnt/input
+            s3:
+              endpoint: minio.lab.sspcloud.fr
+              bucket: argo-artifacts
+              key: data-pipeline/demo/input
+              accessKeySecret:
+                name: prod-minio-cred
+                key: accessKey
+              secretKeySecret:
+                name: prod-minio-cred
+                key: secretKey
+      container:
+        image: busybox
+        command: [sh, -c]
+        args: ["mkdir -p /mnt/tmp /mnt/output; ls -l /mnt/bin /mnt/input /mnt/tmp /mnt/output"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-1 check-duplicated-rows
+    - name: check-duplicated-rows-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_quality/CheckDuplication.py
+               /mnt/input/pokemon-bad.csv /mnt/tmp/output-params.txt | tee /mnt/tmp/Duplicated_rows.txt"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+      outputs:
+        parameters:
+          - name: has-duplicated-rows
+            valueFrom:
+              # Default value to use if retrieving valueFrom fails. If not provided workflow will fail instead
+              default: "True"
+              path: /mnt/tmp/output-params.txt
+
+    # worker template for task-2 check-missing-values
+    - name: check-missing-value-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_quality/CheckMissingValue.py
+                   /mnt/input/pokemon-bad.csv | tee /mnt/tmp/MissingValue.txt"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-3 check-data-shape is from the Global template
+
+
+    # worker template for task-4 check-data-schema
+    - name: check-data-schema-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_info/CheckSchema.py
+               /mnt/input/pokemon-bad.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-5 remove duplicated rows
+    - name: remove-duplicated-rows-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_cleaning/RemoveDuplicatedRows.py
+               /mnt/input/pokemon-bad.csv /mnt/tmp/pokemon-dedup.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-6 rename columns
+    - name: rename-column-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_cleaning/RenameColumns.py
+                /mnt/tmp/pokemon-dedup.csv /mnt/tmp/pokemon-cleaned.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-7 enrich data
+    - name: enrich-data-wt
+      container:
+        image: liupengfei99/python38-ds
+        command: [sh, -c]
+        args: ["python -V && python /mnt/bin/src/data_transformation/GenerateAttackDefModeScore.py
+               /mnt/tmp/pokemon-cleaned.csv /mnt/tmp/pokemon-enriched.csv"]
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
+
+    # worker template for task-8 check-data-shape is from the Global template
+    # worker template for task-9 check-data-shape is from the Cluster template
