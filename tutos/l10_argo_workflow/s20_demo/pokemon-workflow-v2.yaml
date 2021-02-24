@@ -20,6 +20,10 @@ spec:
         value: argo-artifacts
       - name: data-input-path
         value: data-pipeline/demo/input
+      - name: data-mount-path
+        value: /mnt/input
+      - name: input-file-name
+        value: pokemon-bad.csv
 
   volumeClaimTemplates:
     - metadata:
@@ -121,7 +125,7 @@ spec:
               repo: "{{workflow.parameters.git-code-source}}"
               revision: "main"
           - name: input-data
-            path: /mnt/input
+            path: "{{workflow.parameters.data-mount-path}}"
             s3:
               endpoint: "{{workflow.parameters.s3-endpoint-name}}"
               bucket: "{{workflow.parameters.s3-bucket-name}}"
@@ -135,7 +139,7 @@ spec:
       container:
         image: busybox
         command: [sh, -c]
-        args: ["mkdir -p /mnt/tmp /mnt/output; ls -l /mnt/bin /mnt/input /mnt/tmp /mnt/output"]
+        args: ["mkdir -p /mnt/tmp /mnt/output; ls -l /mnt/bin {{workflow.parameters.data-mount-path}} /mnt/tmp /mnt/output"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
@@ -146,7 +150,7 @@ spec:
         image: liupengfei99/python38-ds
         command: [sh, -c]
         args: ["python -V && python /mnt/bin/src/data_quality/CheckDuplication.py
-               /mnt/input/pokemon-bad.csv /mnt/tmp/output-params.txt | tee /mnt/tmp/Duplicated_rows.txt"]
+               {{workflow.parameters.data-mount-path}}/{{workflow.parameters.input-file-name}} /mnt/tmp/output-params.txt | tee /mnt/tmp/Duplicated_rows.txt"]
         volumeMounts:
           - name: workflow-tmp
             mountPath: /mnt
