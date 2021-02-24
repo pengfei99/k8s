@@ -82,7 +82,7 @@ spec:
             when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == False"
           # task 6: rename column name
           - name: rename-column
-            dependencies: [remove-duplicated-rows]
+            dependencies: [remove-duplicated-rows,copy-origin-input-file]
             template: rename-column-wt
           # task 7: enrich data with new columns
           - name: enrich-data
