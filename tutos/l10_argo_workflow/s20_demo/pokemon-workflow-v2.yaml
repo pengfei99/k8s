@@ -43,16 +43,16 @@ spec:
             templateRef:
               name: check-data-quality
               template: check-data-shape-wt
-              arguments:
-                parameters:
-                  - name: input-data-path
-                    value: /mnt/tmp/pokemon-bad.csv
-                  - name: code-path
-                    value: bin/src/data_info/CheckShape.py
-                  - name: volume-name
-                    value: workflow-tmp
-                  - name: volume-mount-path
-                    value: /mnt
+            arguments:
+              parameters:
+                - name: input-data-path
+                  value: /mnt/tmp/pokemon-bad.csv
+                - name: code-path
+                  value: bin/src/data_info/CheckShape.py
+                - name: volume-name
+                  value: workflow-tmp
+                - name: volume-mount-path
+                  value: /mnt
           # task 4: check missing values
           - name: check-data-schema
             dependencies: [load-code-and-data]
