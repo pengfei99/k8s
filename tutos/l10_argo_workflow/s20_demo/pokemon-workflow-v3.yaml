@@ -13,4 +13,4 @@ spec:
           ]
   workflowTemplateRef:
     name: pokemon-workflow-template
-    clusterScope: true
+#    clusterScope: true
