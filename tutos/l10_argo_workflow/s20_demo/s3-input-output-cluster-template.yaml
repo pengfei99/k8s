@@ -4,10 +4,6 @@ metadata:
   name: s3-input-output-template
 spec:
   entrypoint: s3-output
-  arguments:
-    parameters:
-      - name: file-name
-      - name: file-path
   templates:
     - name: s3-output
       inputs:
