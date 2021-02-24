@@ -193,7 +193,7 @@ spec:
             mountPath: /mnt
 
     # worker template for task-5 remove duplicated rows
-    - name: remove-duplicated-rows-wt
+    - name: copy-origin-input-file-wt
       container:
         image: liupengfei99/python38-ds
         command: [sh, -c]
@@ -204,7 +204,7 @@ spec:
             mountPath: /mnt
 
     # worker template for task-5-1 remove duplicated rows
-    - name: remove-duplicated-rows-wt
+    - name: copy--wt
       container:
         image: busybox
         command: [sh, -c]
