@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: s3-input-output-template
+  name: ClusterWorkflowTemplate
 spec:
   entrypoint: s3-output
   arguments:
@@ -14,33 +14,33 @@ spec:
         parameters:
           - name: file-name
           - name: file-path
-        container:
-          image: busybox
-          command: [sh, -c]
-          args: ["echo save {{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}
+      container:
+        image: busybox
+        command: [sh, -c]
+        args: ["echo save {{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}
                       to s3://minio.lab.sspcloud.fr/argo-artifacts/tmp/;
                       cp {{inputs.parameters.file-path}}/{{inputs.parameters.file-name}}
                          /tmp/{{inputs.parameters.file-name}}"]
-          volumeMounts:
-            - name: workflow-tmp
-              mountPath: /mnt
-            - name: out
-              mountPath: /tmp
-        # k8sapi executor does not support outputs from base image laye, have to use a emptyDir
-        volumes:
+        volumeMounts:
+          - name: workflow-tmp
+            mountPath: /mnt
           - name: out
-            emptyDir: { }
-        outputs:
-          artifacts:
-            - name: output-file
-              path: "/tmp/{{inputs.parameters.file-name}}"
-              s3:
-                endpoint: minio.lab.sspcloud.fr
-                bucket: argo-artifacts
-                key: "tmp/{{inputs.parameters.file-name}}.tgz"
-                accessKeySecret:
-                  name: prod-minio-cred
-                  key: accessKey
-                secretKeySecret:
-                  name: prod-minio-cred
-                  key: secretKey
+            mountPath: /tmp
+        # k8sapi executor does not support outputs from base image laye, have to use a emptyDir
+      volumes:
+        - name: out
+          emptyDir: { }
+      outputs:
+        artifacts:
+          - name: output-file
+            path: "/tmp/{{inputs.parameters.file-name}}"
+            s3:
+              endpoint: minio.lab.sspcloud.fr
+              bucket: argo-artifacts
+              key: "tmp/{{inputs.parameters.file-name}}.tgz"
+              accessKeySecret:
+                name: prod-minio-cred
+                key: accessKey
+              secretKeySecret:
+                name: prod-minio-cred
+                key: secretKey
