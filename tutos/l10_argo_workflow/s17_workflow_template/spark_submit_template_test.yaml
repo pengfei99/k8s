@@ -17,7 +17,8 @@ spec:
       container:
         image: inseefrlab/jupyter-datascience:master
         command: [sh, -c]
-        args: ["echo $KUBERNETES_SERVICE_ACCOUNT;
+        args: ["setenv KUBERNETES_SERVICE_ACCOUNT
+                echo $KUBERNETES_SERVICE_ACCOUNT;
                 env;
                 /opt/spark/bin/spark-submit
                 --master k8s://https://kubernetes.default:443

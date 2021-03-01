@@ -55,4 +55,4 @@ spec:
                 - 'kubectl'
                 - 'delete'
                 - 'pod'
-                - '-field-selector=status.phase==Succeeded'
+                - '--field-selector=status.phase==Succeeded'
