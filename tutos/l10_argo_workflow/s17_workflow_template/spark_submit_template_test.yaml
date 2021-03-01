@@ -8,10 +8,6 @@ spec:
   # The entrypoint in the template is the default entrypoint. If the workflow which calls the template also provides an
   # entrypoint, the default one will be replaced
   entrypoint: main
-  # This template has an exit handler
-  onExit: exit-handler
-  # Template can have default arguments, if the workflow which calls the template also provides the same
-  # arguments. The default arguments will be override.
   arguments:
     parameters:
       - name: message
@@ -22,6 +18,7 @@ spec:
         image: inseefrlab/jupyter-datascience:master
         command: [sh, -c]
         args: ["echo $KUBERNETES_SERVICE_ACCOUNT;",
+               "env;",
                 "/opt/spark/bin/spark-submit",
                  "--master k8s://https://kubernetes.default:443",
                  "--deploy-mode cluster",
@@ -33,12 +30,3 @@ spec:
                  "--conf spark.kubernetes.authenticate.driver.serviceAccountName=$KUBERNETES_SERVICE_ACCOUNT",
                  "local:///opt/spark/examples/jars/spark-examples_2.12-3.0.1.jar"]
         imagePullPolicy: IfNotPresent
-   # exit handler template
-    - name: exit-handler
-      container:
-        image: busybox
-        args: ["echo", "Exit Handler"]
-        imagePullPolicy: IfNotPresent
-
-# To submit a workflow template
-# argo template create path/to/template.yaml
