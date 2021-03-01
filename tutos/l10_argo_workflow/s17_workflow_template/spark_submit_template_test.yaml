@@ -1,9 +1,9 @@
 # The workflow template definition in argo v2.7 and after are fully compatible with Workflow definitions. 
 # You only need to change kind: Workflow to kind: WorkflowTemplate to convert existing Workflow to a WorkflowTemplate.
 apiVersion: argoproj.io/v1alpha1
-kind: WorkflowTemplate
+kind: workflow
 metadata:
-  name: spark-submit-template
+  name: spark-submit-test
 spec:
   # The entrypoint in the template is the default entrypoint. If the workflow which calls the template also provides an
   # entrypoint, the default one will be replaced
@@ -20,12 +20,17 @@ spec:
     - name: main
       container:
         image: inseefrlab/jupyter-datascience:master
-        args: ["echo", "main template prints {{workflow.parameters.message}}"]
-        imagePullPolicy: IfNotPresent
-    - name: backup
-      container:
-        image: busybox
-        args: ["echo", "backup template prints {{workflow.parameters.message}}"]
+        command: [sh, -c]
+        args: ["/opt/spark/bin/spark-submit",
+                 "--master k8s://https://kubernetes.default:443",
+                 "--deploy-mode cluster",
+                 "--name spark-pi",
+                 "--class org.apache.spark.examples.SparkPi",
+                 "--conf spark.executor.instances=5",
+                 "--conf spark.kubernetes.container.image=inseefrlab/jupyter-datascience:master",
+                 "--conf spark.kubernetes.namespace=$KUBERNETES_NAMESPACE",
+                 "--conf spark.kubernetes.authenticate.driver.serviceAccountName=$KUBERNETES_SERVICE_ACCOUNT",
+                 "local:///opt/spark/examples/jars/spark-examples_2.12-3.0.1.jar"]
         imagePullPolicy: IfNotPresent
    # exit handler template
     - name: exit-handler
