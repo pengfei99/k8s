@@ -17,7 +17,8 @@ spec:
     # - "Always": retries on both errors and failures 
     # Providing an empty retryStrategy (i.e. retryStrategy: {}) will cause a container to retry until completion.
       retryPolicy: "Always"
-    # backoff is an exponential backoff  
+      # backoff is an exponential backoff
+      # https://en.wikipedia.org/wiki/Exponential_backoff
       backoff:
         duration: "1"      # Must be a string. Default unit is seconds. Could also be a Duration, e.g.: "2m", "6h", "1d"
         factor: 2
