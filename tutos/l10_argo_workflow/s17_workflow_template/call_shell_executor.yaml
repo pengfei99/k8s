@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: call-shell-executor-
+spec:
+#  entrypoint: main
+  arguments:
+    parameters:
+      - name: script
+        value: "env; echo toto"
+  workflowTemplateRef:
+    name: shell-executor-template
