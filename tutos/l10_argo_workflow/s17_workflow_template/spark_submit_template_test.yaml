@@ -1,7 +1,7 @@
 # The workflow template definition in argo v2.7 and after are fully compatible with Workflow definitions. 
 # You only need to change kind: Workflow to kind: WorkflowTemplate to convert existing Workflow to a WorkflowTemplate.
 apiVersion: argoproj.io/v1alpha1
-kind: workflow
+kind: Workflow
 metadata:
   name: spark-submit-test
 spec:
@@ -21,7 +21,8 @@ spec:
       container:
         image: inseefrlab/jupyter-datascience:master
         command: [sh, -c]
-        args: ["/opt/spark/bin/spark-submit",
+        args: ["echo $KUBERNETES_SERVICE_ACCOUNT;",
+                "/opt/spark/bin/spark-submit",
                  "--master k8s://https://kubernetes.default:443",
                  "--deploy-mode cluster",
                  "--name spark-pi",
