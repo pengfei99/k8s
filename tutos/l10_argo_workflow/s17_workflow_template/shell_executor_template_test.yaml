@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: shell-executor-test-
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: script
+        value: $SHELL --version
+  templates:
+    - name: main
+      container:
+        image: busybox
+        command: [sh, -c]
+        args: ["{{workflow.parameters.script}}"]
+        imagePullPolicy: IfNotPresent
