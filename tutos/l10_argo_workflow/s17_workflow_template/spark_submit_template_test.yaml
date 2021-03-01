@@ -17,16 +17,16 @@ spec:
       container:
         image: inseefrlab/jupyter-datascience:master
         command: [sh, -c]
-        args: ["echo $KUBERNETES_SERVICE_ACCOUNT;",
-               "env;",
-                "/opt/spark/bin/spark-submit",
-                 "--master k8s://https://kubernetes.default:443",
-                 "--deploy-mode cluster",
-                 "--name spark-pi",
-                 "--class org.apache.spark.examples.SparkPi",
-                 "--conf spark.executor.instances=5",
-                 "--conf spark.kubernetes.container.image=inseefrlab/jupyter-datascience:master",
-                 "--conf spark.kubernetes.namespace=$KUBERNETES_NAMESPACE",
-                 "--conf spark.kubernetes.authenticate.driver.serviceAccountName=$KUBERNETES_SERVICE_ACCOUNT",
-                 "local:///opt/spark/examples/jars/spark-examples_2.12-3.0.1.jar"]
+        args: ["echo $KUBERNETES_SERVICE_ACCOUNT;
+                env;
+                /opt/spark/bin/spark-submit
+                --master k8s://https://kubernetes.default:443
+                --deploy-mode cluster
+                --name spark-pi
+                --class org.apache.spark.examples.SparkPi
+                --conf spark.executor.instances=5
+                --conf spark.kubernetes.container.image=inseefrlab/jupyter-datascience:master
+                --conf spark.kubernetes.namespace=$KUBERNETES_NAMESPACE
+                --conf spark.kubernetes.authenticate.driver.serviceAccountName=$KUBERNETES_SERVICE_ACCOUNT
+                local:///opt/spark/examples/jars/spark-examples_2.12-3.0.1.jar"]
         imagePullPolicy: IfNotPresent
