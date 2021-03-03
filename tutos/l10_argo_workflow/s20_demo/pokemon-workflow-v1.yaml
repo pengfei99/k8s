@@ -68,7 +68,7 @@ spec:
             dependencies: [check-duplicated-rows,check-missing-value]
             template: remove-duplicated-rows-wt
             when: "{{tasks.check-duplicated-rows.outputs.parameters.has-duplicated-rows}} == True"
-          # task 5-1: if no duplicated rows, copy the input file
+          # task 5-1: if no duplicated rows, copy the origin input file
           - name: copy-origin-input-file
             dependencies: [check-duplicated-rows,check-missing-value]
             template: copy-origin-input-file-wt

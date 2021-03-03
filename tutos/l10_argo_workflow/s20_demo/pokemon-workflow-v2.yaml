@@ -237,4 +237,4 @@ spec:
             mountPath: /mnt
 
     # worker template for task-8 check-data-shape is from the Global template
-    # worker template for task-9 check-data-shape is from the Cluster template
+    # worker template for task-9 save-result is from the Cluster template
