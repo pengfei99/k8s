@@ -1,0 +1,3 @@
+workflow:
+  args: env
+  template-name: shell-executor-template

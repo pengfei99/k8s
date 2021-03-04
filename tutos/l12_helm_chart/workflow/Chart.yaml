@@ -1,0 +1,12 @@
+apiVersion: v2
+name: workflow
+description: "A helm chart to submit jobs to argo workflow"
+type: application
+version: 0.1.0
+appVersion: 2.12.9
+keywords:
+  - argo-workflow
+  - run-job
+home: https://github.com/
+sources:
+  - https://github.com/

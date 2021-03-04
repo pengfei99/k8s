@@ -1,0 +1,11 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: call-shell-executor-{{ .Release.Name }}
+spec:
+  arguments:
+    parameters:
+      - name: script
+        value: {{.Values.workflow.args}}
+  workflowTemplateRef:
+    name: {{.Values.workflow.template-name}}

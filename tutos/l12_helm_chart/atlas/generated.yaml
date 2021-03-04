@@ -27,7 +27,7 @@ spec:
   restartPolicy: Never
 MANIFEST:
 ---
-# Source: atlas/templates/configmap.yaml
+# Source: atlas/templates/simpleJob.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
