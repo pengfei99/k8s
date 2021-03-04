@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "templateName": {
+      "description": "name of the invoking workflow template",
+      "type": "string",
+      "default": "shell-executor-template",
+      "x-form": {
+        "value": "{{templateName}}"
+      }
+    },
+    "param": {
+      "description": "init param for workflow template",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "param name",
+          "default": "script",
+          "x-form": {
+            "value": "{{param.name}}"
+          }
+        },
+        "value": {
+          "type": "string",
+          "description": "param value",
+          "default": "env",
+          "x-form": {
+            "value": "{{param.value}}"
+          }
+        }
+      }
+    }
+  }
+}
