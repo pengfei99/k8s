@@ -1,3 +1,5 @@
 workflow:
-  args: env
-  template-name: shell-executor-template
+  param:
+    name: script
+    value: env
+  templateName: shell-executor-template

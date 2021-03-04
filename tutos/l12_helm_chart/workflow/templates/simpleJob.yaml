@@ -5,7 +5,7 @@ metadata:
 spec:
   arguments:
     parameters:
-      - name: script
-        value: {{.Values.workflow.args}}
+      - name: {{.Values.workflow.param.name}}
+        value: {{.Values.workflow.param.value}}
   workflowTemplateRef:
-    name: {{.Values.workflow.template-name}}
+    name: {{.Values.workflow.templateName}}
