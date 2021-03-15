@@ -51,8 +51,9 @@ spec:
           containers:
             - name: kubectl
               image: bitnami/kubectl
+              # kubectl delete pod --field-selector=status.phase!=Running
               command:
                 - 'kubectl'
                 - 'delete'
                 - 'pod'
-                - '--field-selector=status.phase==Succeeded'
+                - '--field-selector=status.phase!=Running'
