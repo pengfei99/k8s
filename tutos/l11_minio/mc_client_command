@@ -22,3 +22,33 @@ allow {
   http_api.claims.preferred_username = "argo-workflow"
   http_api.bucket = "argo-artifacts"
 }
+
+
+
+
+export AWS_ACCESS_KEY_ID= CPLBG49L80RMFFURFWVI
+export AWS_SECRET_ACCESS_KEY= yq1GZSZigfPtSHfXi04a2yZ4YXr6w7RPp7NzHi2k
+export AWS_DEFAULT_REGION= us-east-1
+export AWS_SESSION_TOKEN= eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJDUExCRzQ5TDgwUk1GRlVSRldWSSIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJhdWQiOlsib255eGlhIiwiYWNjb3VudCJdLCJhdXRoX3RpbWUiOjE2MTQ5MzgzNjksImF6cCI6Im9ueXhpYSIsImVtYWlsIjoibGl1LnBlbmdmZWlAaG90bWFpbC5mciIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOiIxNjE0OTgxNTY5IiwiZmFtaWx5X25hbWUiOiJMaXUiLCJnaXZlbl9uYW1lIjoiUGVuZ2ZlaSIsImdyb3VwcyI6WyJzc3BjbG91ZC1hZG1pbiJdLCJpYXQiOjE2MTQ5MzkzNjYsImlzcyI6Imh0dHBzOi8vYXV0aC5sYWIuc3NwY2xvdWQuZnIvYXV0aC9yZWFsbXMvc3NwY2xvdWQiLCJqdGkiOiJlZmYzODk5MC03OWJkLTRhNTMtOWNhMy0wNTRkOTc2OGM2OTUiLCJuYW1lIjoiUGVuZ2ZlaSBMaXUiLCJub25jZSI6ImY1YTFhYjY0LTE0NTYtNGQxYy05MzViLWJmOWRkNmI2MGQ0YSIsInBvbGljeSI6IiIsInByZWZlcnJlZF91c2VybmFtZSI6InBlbmdmZWkiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiQXRsYXNfcm9sZV9hZG1pbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2Vzc2lvbl9zdGF0ZSI6IjMzOGY1ZjI5LTYzNTktNDE3Zi05MzBiLWNmNjI0YmYyYzIxNiIsInN1YiI6IjQ3MzQ5MTI4LTRhNGMtNDIyNi1hNWIxLTY4MDgwMWFmNWEyYiIsInR5cCI6IkJlYXJlciJ9.8HgiStdZu2vF-bQovLyHD12pLKIzkGm5V6zaqlki-A0Mc-jGnV9qpRXVIkeMZh6aBGGL67P3xUKO18iD28HZBA
+export AWS_S3_ENDPOINT= minio.lab.sspcloud.fr
+
+
+ {
+     val spark = SparkSession
+         .builder()
+         .appName("StructStreaming")
+         .master("yarn")
+         .config("hive.merge.mapfiles", "false")
+         .config("hive.merge.tezfiles", "false")
+         .config("parquet.enable.summary-metadata", "false")
+         .config("spark.sql.parquet.mergeSchema","false")
+         .config("hive.merge.smallfiles.avgsize", "160000000")
+         .enableHiveSupport()
+         .config("hive.exec.dynamic.partition", "true")
+         .config("hive.exec.dynamic.partition.mode", "nonstrict")
+         .config("spark.sql.orc.impl", "native")
+         .config("spark.sql.parquet.binaryAsString","true")
+         .config("spark.sql.parquet.writeLegacyFormat","true")
+         //.config(“spark.sql.streaming.checkpointLocation”, “hdfs://pp/apps/hive/warehouse/dev01_landing_initial_area.db”)
+         .getOrCreate()
+ }
