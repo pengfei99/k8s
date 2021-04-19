@@ -6,7 +6,7 @@ mv mc /usr/local/bin
 
 # configure minio client to connect to a minio service. Here I define the name as minio, you can call it as you want. 
 # For example, mystorage 
-mc alias set minio https://minio.kub.sspcloud.fr/ <accesskey> <secretkey>
+mc alias set minio https://minio.lab.sspcloud.fr/ minio rey6FKM24pfLmZeSZ2hWcdzFRjaNB9tA
 # check your minio service status, note this works only if your account have admin right
 mc admin info minio
 

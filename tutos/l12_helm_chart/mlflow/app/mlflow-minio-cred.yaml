@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mlflow-minio-cred
+type: opaque
+# string data accepts clear text, data accepts only base64 code
+stringData:
+  accessKey: mlflow
+  secretKey: changeMe
