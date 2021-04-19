@@ -14,23 +14,56 @@ spec:
         app: mlflow-deployment
     spec:
       containers:
-      - name: mlflow-deployment
-        image: dkhundley/mlflow-server:1.0.3
-        imagePullPolicy: Always
-        args:
-        - --host=0.0.0.0
-        - --port=5000
-        - --backend-store-uri=postgresql://mlflow_user:mlflow_pwd@10.98.160.170:5432/mlflow_db
-        - --default-artifact-root=s3://mlflow/
-        - --workers=2
-        env:
-        - name: MLFLOW_S3_ENDPOINT_URL
-          value: http://mlflow-minio.local/
-        - name: AWS_ACCESS_KEY_ID
-          value: "minio"
-        - name: AWS_SECRET_ACCESS_KEY
-          value: "minio123"
-        ports:
-        - name: http
-          containerPort: 5000
-          protocol: TCP
+        - name: mlflow-deployment
+          image: liupengfei99/mlflow:1.14.1
+          imagePullPolicy: Always
+          args:
+            - --host=0.0.0.0
+            - --port=8000
+            - --backend-store-uri=postgresql://${MLFLOW_DB_LOGIN}:${MLFLOW_DB_PWD}@${MLFLOW_DB_SERVER_URL}:${MLFLOW_DB_SERVER_PORT}/${MLFLOW_DB_NAME}
+            - --default-artifact-root=s3://${MLFLOW_S3_BUCKET_NAME}/${MLFLOW_S3_PATH}/
+            - --workers=2
+          env:
+            # env var for s3 connexion
+            - name: MLFLOW_S3_ENDPOINT_URL
+              value: https://minio.lab.sspcloud.fr
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-minio-cred
+                  key: accessKey
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-minio-cred
+                  key: secretKey
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+            - name: MLFLOW_S3_BUCKET_NAME
+              value: projet-mlflow-registry
+            - name: MLFLOW_S3_PATH
+              value: dev-models-repo
+            # env var for postgresql server connexion
+            - name: MLFLOW_DB_SERVER_URL
+              value: 10.233.5.21
+            - name: MLFLOW_DB_SERVER_PORT
+              value: 5432
+            - name: MLFLOW_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-postgresql-db-cred
+                  key: dbName
+            - name: MLFLOW_DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-postgresql-db-cred
+                  key: dbLogin
+            - name: MLFLOW_DB_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-postgresql-db-cred
+                  key: dbPwd
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
