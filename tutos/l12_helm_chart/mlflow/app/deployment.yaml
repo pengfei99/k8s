@@ -45,9 +45,9 @@ spec:
               value: dev-models-repo
             # env var for postgresql server connexion
             - name: MLFLOW_DB_SERVER_URL
-              value: 10.233.5.21
+              value: "10.233.5.21"
             - name: MLFLOW_DB_SERVER_PORT
-              value: 5432
+              value: "5432"
             - name: MLFLOW_DB_NAME
               valueFrom:
                 secretKeyRef:
