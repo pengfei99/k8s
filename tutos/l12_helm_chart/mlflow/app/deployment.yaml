@@ -20,8 +20,8 @@ spec:
           args:
             - --host=0.0.0.0
             - --port=8000
-            - --backend-store-uri=postgresql://${MLFLOW_DB_LOGIN}:${MLFLOW_DB_PWD}@${MLFLOW_DB_SERVER_URL}:${MLFLOW_DB_SERVER_PORT}/${MLFLOW_DB_NAME}
-            - --default-artifact-root=s3://${MLFLOW_S3_BUCKET_NAME}/${MLFLOW_S3_PATH}/
+            - --backend-store-uri=postgresql://$(MLFLOW_DB_LOGIN):$(MLFLOW_DB_PWD)@$(MLFLOW_DB_SERVER_URL):$(MLFLOW_DB_SERVER_PORT)/$(MLFLOW_DB_NAME)
+            - --default-artifact-root=s3://$(MLFLOW_S3_BUCKET_NAME)/$(MLFLOW_S3_PATH)/
             - --workers=2
           env:
             # env var for s3 connexion
