@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: mlflow-deployment
-          image: liupengfei99/mlflow:1.14.1
+          image: liupengfei99/mlflow-deployment
           imagePullPolicy: Always
           command: ["mlflow", "models","serve"]
           args:
