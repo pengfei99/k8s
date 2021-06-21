@@ -147,3 +147,15 @@ kubectl run -i --tty busybox --image=busybox --restart=Never -- sh -n user-pengf
 kubectl run --rm utils -it --image eddiehale/utils --restart=Never bash 
 # if you want to output the generated spec to a file
 kubectl run -i --tty busybox --image=busybox --restart=Never -- sh -n user-pengfei --dry-run -o yaml > pod.yaml
+
+############################## Edit a resource en live ####################################
+# We can edit a resource en live (e.g. pod, deployment, etc.)
+# Solution 1 use kubectl edit deployment/<deployment-name>
+kubectl edit deployment/jupyter-1623939817
+# The above will open an editor to allow you to modify the deployment spec
+
+# Solution 2 use kubectl patch deployment <deployment-name> -p <path-content>. The <path-content> can be in json or yaml format
+# Following example modify the deployment container image 
+kubectl patch depolyment jupyter-1623939817 -p   '{"spec":{"template":{"spec":{"containers":[{"name":"myapp","image":"my-img-repo/myapp:img:3.0"}]}}}}'
+
+## Note the above two solution will both kill your old pod and lanch new ones with new config, all unsaved data in the old pod will be lost 
