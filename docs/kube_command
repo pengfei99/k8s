@@ -159,3 +159,7 @@ kubectl edit deployment/jupyter-1623939817
 kubectl patch depolyment jupyter-1623939817 -p   '{"spec":{"template":{"spec":{"containers":[{"name":"myapp","image":"my-img-repo/myapp:img:3.0"}]}}}}'
 
 ## Note the above two solution will both kill your old pod and lanch new ones with new config, all unsaved data in the old pod will be lost 
+
+########################## Suspend a k8s cronjob #########################################
+
+kubectl patch cronjobs <job-name> -p '{"spec" : {"suspend" : true }}'
