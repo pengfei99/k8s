@@ -4,10 +4,10 @@ configMapGenerator:
 - name: game-config-4
   files:
   # from files
-  - ./game-config/game.properties
-  - ./game-config/ui.properties
-  # from files with custom keys
-  - custom-key-name=./game-config/game.properties
+  - /home/pliu/git/k8s/tutos/l06_configMap/game-config/game.properties
+  - /home/pliu/git/k8s/tutos/l06_configMap/game-config/ui.properties
+  # from files with custom keys, the default value of the key is the name of the file
+  - pengfei-game=/home/pliu/git/k8s/tutos/l06_configMap/game-config/game.properties
   # from literals
   literals:
   - special.how=very

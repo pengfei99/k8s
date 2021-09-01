@@ -11,5 +11,5 @@ spec:
       envFrom:
       - configMapRef:
         # name of the config map
-          name: game-config
+          name: game-config-4-kgt9874t5k
   restartPolicy: Never
