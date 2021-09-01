@@ -14,7 +14,7 @@ spec:
             configMapKeyRef:
               # The ConfigMap name containing the value you want to assign to FOOBAR_AGE
               name: pengfei-config
-              # Specify the key in the configMap wwhich you want to show the value
+              # Specify the key in the configMap which you want to show the value
               key: pengfei.age
         - name: FOOBAR_SEX
           valueFrom:
