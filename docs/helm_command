@@ -36,8 +36,12 @@ helm install pengfei-airflow ./airflow -f ./airflow/values.yml
 helm delete pengfei-airflow
 
 
-helm template 
+ 
 
 ############################## Get the generated manifests of a release ###########################################
 # To check the generated manifests of a release without installing the chart, the '--debug' and '--dry-run' flags can be combined.
+# note --dry-run needs to connect to the k8s api server to generate the manifests
 helm install --debug --dry-run my-release bitnami/cassandra
+
+# if you don't have the connection, you may use helm template command.
+helm template my-amundsen ./amundsen-charts -f ./amundsen-charts/values.yaml 
