@@ -13,13 +13,19 @@ helm search repo <chart_name>
 
 ################################ Helm list release ########################################
 helm ls
-
+################################ Helm show the manifest of a helm release ##################
+helm get manifest amundsen-test
 ################################ Helm install chart ########################################
 # show default values of a chart 
 helm show values bitnami/airflow
 
 # install a chart with custom values
 helm install pengfei-airflow bitnami/airflow -f values.yml
+
+# install a chart with dependencies
+# if your chart has dependencies in it, you may need to update the dependency (e.g. helm dependency update). This will download the chart.gz and create a requirements.lock
+# with a one liner, you can do
+helm install --dependency-update pengfei-airflow bitnami/airflow -f values.yml
 
 
 # upgrade an exsiting release with inline values
