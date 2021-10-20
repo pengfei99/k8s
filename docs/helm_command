@@ -24,7 +24,7 @@ helm install pengfei-airflow bitnami/airflow -f values.yml
 
 # install a chart with dependencies
 # if your chart has dependencies in it, you may need to update the dependency (e.g. helm dependency update). This will download the chart.gz and create a requirements.lock
-# with a one liner, you can do
+# with a one liner, you can do the update dependency before install. But it does not work well. Most of time, the update is not done. So use "helm dependency update".
 helm install --dependency-update pengfei-airflow bitnami/airflow -f values.yml
 
 
