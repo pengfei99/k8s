@@ -81,6 +81,10 @@ kubectl port-forward --namespace user-pengfei svc/static-web-service 80:8080
 kubectl port-forward --namespace user-pengfei svc/pengfei-airflow-postgresql 5432:5432
 
 kubectl port-forward --namespace user-pengfei svc/argo-artifacts 9000:9000
+
+################################### port forward a pod to localhost #########################
+kubectl port-forward <pod-name> <pod-port>:<localhost-port>
+
 ################################### Ingress #################################################
 # show short ingress description
 kubectl get ingress
